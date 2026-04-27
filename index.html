@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Omega Olympiad — Omega Computer Services</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh}
+
+.board{max-width:1400px;margin:0 auto;padding:1.5rem}
+
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:42px;height:42px;border-radius:50%;background:#3C3489;display:flex;align-items:center;justify-content:center;font-size:20px;color:#EEEDFE;font-weight:600}
+.brand-name{font-size:20px;font-weight:600;color:#1a1a1a}
+.brand-sub{font-size:12px;color:#888}
+.season-pill{font-size:12px;padding:5px 14px;border-radius:20px;background:#fff;border:1px solid #e0e0e0;color:#666}
+.season-green{color:#0F6E56;border-color:#9FE1CB;background:#E1F5EE}
+
+.tabs{display:flex;gap:0;margin-bottom:1.25rem;border-bottom:1px solid #e0e0e0}
+.tab{font-size:13px;padding:8px 18px;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;background:none;border-left:none;border-right:none;border-top:none}
+.tab:hover{color:#1a1a1a}
+.tab.active{color:#3C3489;border-bottom:2px solid #3C3489;font-weight:500}
+
+.view{display:none}
+.view.active{display:block}
+
+/* SCOREBOARD */
+.podium-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1rem}
+.podium-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1.25rem;text-align:center}
+.podium-card.p1{border-top:3px solid #B8860B}
+.podium-card.p2{border-top:3px solid #888}
+.podium-card.p3{border-top:3px solid #8B4513}
+.podium-rank{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
+.p1 .podium-rank{color:#B8860B}
+.p2 .podium-rank{color:#888}
+.p3 .podium-rank{color:#8B4513}
+.podium-icon{width:44px;height:44px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600}
+.podium-team{font-size:16px;font-weight:600;color:#1a1a1a}
+.podium-god{font-size:11px;color:#888;margin-bottom:10px}
+.podium-pts{font-size:26px;font-weight:700}
+.p1 .podium-pts{color:#B8860B}
+.p2 .podium-pts{color:#888}
+.p3 .podium-pts{color:#8B4513}
+.podium-sub{font-size:11px;color:#aaa;margin-top:4px}
+
+.standings-table{background:#fff;border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;margin-bottom:1rem}
+.standings-row{display:grid;grid-template-columns:36px 1fr 90px 80px 80px 100px;align-items:center;padding:11px 16px;border-bottom:1px solid #f0f0f0;gap:8px}
+.standings-row:last-child{border-bottom:none}
+.standings-row.header{background:#fafafa;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#aaa}
+.rank-num{font-size:14px;font-weight:600;color:#888;text-align:center}
+.team-info{display:flex;align-items:center;gap:9px}
+.team-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.team-label{font-size:13px;font-weight:500;color:#1a1a1a}
+.team-sub{font-size:11px;color:#aaa}
+.pts-val{font-size:15px;font-weight:600;color:#1a1a1a;text-align:right}
+.quests-val{font-size:13px;color:#666;text-align:center}
+.streak-val{font-size:13px;text-align:center}
+.trend{font-size:12px;font-weight:500;text-align:center;padding:3px 8px;border-radius:10px}
+.trend.up{color:#0F6E56;background:#E1F5EE}
+.trend.down{color:#993C1D;background:#FAECE7}
+.trend.same{color:#888;background:#f5f5f3}
+
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.summary-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:14px;text-align:center}
+.summary-num{font-size:24px;font-weight:700;color:#1a1a1a}
+.summary-lbl{font-size:11px;color:#888;margin-top:3px}
+
+/* QUEST BOARD */
+.week-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.week-label{font-size:16px;font-weight:600;color:#1a1a1a}
+.week-sub{font-size:12px;color:#888;margin-top:2px}
+.quest-meta{display:flex;gap:6px;flex-wrap:wrap}
+.meta-pill{font-size:11px;padding:4px 10px;border-radius:10px;border:1px solid #e0e0e0;background:#fff;color:#666}
+
+.active-quests{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:1rem}
+.aq-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1rem}
+.aq-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:6px}
+.aq-name{font-size:13px;font-weight:600;color:#1a1a1a;line-height:1.3}
+.aq-pts{font-size:12px;font-weight:600;white-space:nowrap}
+.aq-desc{font-size:11px;color:#888;line-height:1.5;margin-bottom:10px}
+.aq-teams{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.aq-team-tag{font-size:10px;padding:2px 7px;border-radius:8px;background:#E6F1FB;color:#185FA5}
+.aq-progress{margin-top:6px}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:5px}
+.progress-bar{height:5px;border-radius:3px;background:#f0f0f0;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px}
+.type-stripe{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0;margin-right:2px}
+
+/* TEAM TRACKER */
+.team-selector{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+.team-btn{font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid #e0e0e0;background:#fff;color:#666;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px}
+.team-btn:hover{background:#f5f5f3}
+.team-btn.active{color:#fff;border-color:transparent}
+.team-dot-sm{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+.team-detail{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.td-header{display:flex;align-items:center;gap:14px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #f0f0f0}
+.td-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.td-name{font-size:18px;font-weight:600;color:#1a1a1a}
+.td-role{font-size:12px;color:#888;margin-top:2px}
+.td-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem}
+.td-stat{text-align:center;padding:12px;background:#fafafa;border-radius:8px;border:1px solid #f0f0f0}
+.td-stat-num{font-size:20px;font-weight:700;color:#1a1a1a}
+.td-stat-lbl{font-size:10px;color:#aaa;margin-top:3px}
+.td-quests-title{font-size:11px;font-weight:600;color:#aaa;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em}
+.td-quest-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f3}
+.td-quest-item:last-child{border-bottom:none}
+.td-q-status{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700}
+.td-q-status.done{background:#EAF3DE;color:#3B6D11}
+.td-q-status.prog{background:#E6F1FB;color:#185FA5}
+.td-q-status.open{background:#f5f5f3;color:#aaa}
+.td-q-name{font-size:13px;color:#1a1a1a;flex:1;font-weight:500}
+.td-q-pts{font-size:12px;color:#888;white-space:nowrap}
+.td-q-prog{font-size:11px;color:#aaa;min-width:140px;text-align:right}
+
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:1rem;font-size:12px;color:#888}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:10px;height:14px;border-radius:2px;flex-shrink:0}
+
+@media(max-width:700px){
+  .podium-row{grid-template-columns:1fr}
+  .standings-row{grid-template-columns:28px 1fr 70px 50px}
+  .standings-row .quests-val,.standings-row .trend{display:none}
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+  .td-stats{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="board">
+
+<div class="top-bar">
+  <div class="brand">
+    <div class="brand-logo">Ω</div>
+    <div>
+      <div class="brand-name">Omega Olympiad</div>
+      <div class="brand-sub">Omega Computer Services · Michigan</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <div class="season-pill">Q2 2025 Season · Week 6 of 13</div>
+    <div class="season-pill season-green">47 days remaining</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('scoreboard',this)">Scoreboard</button>
+  <button class="tab" onclick="switchTab('quests',this)">Active quests</button>
+  <button class="tab" onclick="switchTab('teams',this)">Team tracker</button>
+</div>
+
+<!-- SCOREBOARD -->
+<div class="view active" id="view-scoreboard">
+  <div class="podium-row">
+    <div class="podium-card p2">
+      <div class="podium-rank">2nd place</div>
+      <div class="podium-icon" style="background:#E6F1FB;color:#185FA5">He</div>
+      <div class="podium-team">Hermes</div>
+      <div class="podium-god">Dispatch & Client Success</div>
+      <div class="podium-pts">2,150</div>
+      <div class="podium-sub">14 quests · 2 cross-team</div>
+    </div>
+    <div class="podium-card p1">
+      <div class="podium-rank">🏆 1st place</div>
+      <div class="podium-icon" style="background:#EEEDFE;color:#3C3489">Ar</div>
+      <div class="podium-team">Artemis</div>
+      <div class="podium-god">Service Team</div>
+      <div class="podium-pts">2,475</div>
+      <div class="podium-sub">16 quests · 3 cross-team</div>
+    </div>
+    <div class="podium-card p3">
+      <div class="podium-rank">3rd place</div>
+      <div class="podium-icon" style="background:#E1F5EE;color:#0F6E56">At</div>
+      <div class="podium-team">Athena</div>
+      <div class="podium-god">Field Service</div>
+      <div class="podium-pts">1,950</div>
+      <div class="podium-sub">13 quests · 1 cross-team</div>
+    </div>
+  </div>
+
+  <div class="standings-table">
+    <div class="standings-row header">
+      <div></div><div>Team</div><div style="text-align:right">Points</div><div style="text-align:center">Quests</div><div style="text-align:center">Streak</div><div style="text-align:center">vs last week</div>
+    </div>
+    <div class="standings-row">
+      <div class="rank-num" style="color:#B8860B;font-size:16px">1</div>
+      <div class="team-info"><div class="team-dot" style="background:#7F77DD"></div><div><div class="team-label">Artemis</div><div class="team-sub">Service Team</div></div></div>
+      <div class="pts-val">2,475</div><div class="quests-val">16</div><div class="streak-val">🔥 4</div><div class="trend up">+325 pts</div>
+    </div>
+    <div class="standings-row">
+      <div class="rank-num">2</div>
+      <div class="team-info"><div class="team-dot" style="background:#378ADD"></div><div><div class="team-label">Hermes</div><div class="team-sub">Dispatch & Client Success</div></div></div>
+      <div class="pts-val">2,150</div><div class="quests-val">14</div><div class="streak-val">🔥 3</div><div class="trend up">+200 pts</div>
+    </div>
+    <div class="standings-row">
+      <div class="rank-num">3</div>
+      <div class="team-info"><div class="team-dot" style="background:#1D9E75"></div><div><div class="team-label">Athena</div><div class="team-sub">Field Service</div></div></div>
+      <div class="pts-val">1,950</div><div class="quests-val">13</div><div class="streak-val">🔥 2</div><div class="trend up">+175 pts</div>
+    </div>
+    <div class="standings-row">
+      <div class="rank-num">4</div>
+      <div class="team-info"><div class="team-dot" style="background:#D85A30"></div><div><div class="team-label">Ares</div><div class="team-sub">Service Team</div></div></div>
+      <div class="pts-val">1,725</div><div class="quests-val">11</div><div class="streak-val">— 0</div><div class="trend down">-50 pts</div>
+    </div>
+    <div class="standings-row">
+      <div class="rank-num">5</div>
+      <div class="team-info"><div class="team-dot" style="background:#EF9F27"></div><div><div class="team-label">Hephaestus</div><div class="team-sub">PST</div></div></div>
+      <div class="pts-val">1,600</div><div class="quests-val">10</div><div class="streak-val">🔥 1</div><div class="trend up">+125 pts</div>
+    </div>
+    <div class="standings-row">
+      <div class="rank-num">6</div>
+      <div class="team-info"><div class="team-dot" style="background:#D4537E"></div><div><div class="team-label">Aphrodite</div><div class="team-sub">Marketing</div></div></div>
+      <div class="pts-val">1,375</div><div class="quests-val">9</div><div class="streak-val">— 0</div><div class="trend same">+0 pts</div>
+    </div>
+    <div class="standings-row">
+      <div class="rank-num">7</div>
+      <div class="team-info"><div class="team-dot" style="background:#5DCAA5"></div><div><div class="team-label">Demeter</div><div class="team-sub">Inventory</div></div></div>
+      <div class="pts-val">1,200</div><div class="quests-val">8</div><div class="streak-val">🔥 2</div><div class="trend up">+100 pts</div>
+    </div>
+    <div class="standings-row">
+      <div class="rank-num">8</div>
+      <div class="team-info"><div class="team-dot" style="background:#3C3489"></div><div><div class="team-label">Zeus</div><div class="team-sub">Leadership</div></div></div>
+      <div class="pts-val">1,050</div><div class="quests-val">7</div><div class="streak-val">— 0</div><div class="trend down">-25 pts</div>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card"><div class="summary-num">13,525</div><div class="summary-lbl">Total points earned</div></div>
+    <div class="summary-card"><div class="summary-num">88</div><div class="summary-lbl">Quests completed</div></div>
+    <div class="summary-card"><div class="summary-num" style="color:#1D9E75">12</div><div class="summary-lbl">Cross-team completions</div></div>
+    <div class="summary-card"><div class="summary-num" style="color:#BA7517">2</div><div class="summary-lbl">Titan quests claimed</div></div>
+  </div>
+</div>
+
+<!-- ACTIVE QUESTS -->
+<div class="view" id="view-quests">
+  <div class="week-header">
+    <div>
+      <div class="week-label">Week 6 Active Quests</div>
+      <div class="week-sub">Apr 21 – Apr 27, 2025 · Resets Monday</div>
+    </div>
+    <div class="quest-meta">
+      <span class="meta-pill" style="color:#BA7517;border-color:#FAC775;background:#FAEEDA">1 Titan quest</span>
+      <span class="meta-pill" style="color:#1D9E75;border-color:#9FE1CB;background:#E1F5EE">2 Cross-team</span>
+      <span class="meta-pill">7 Standard</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#BA7517"></span>Titan quest</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Cross-team (multiplier)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Standard weekly</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#D4537E"></span>Fun / wildcard</span>
+  </div>
+
+  <div class="active-quests">
+    <div class="aq-card" style="border-left:3px solid #BA7517">
+      <div class="aq-top"><div class="aq-name">The Augean Stables</div><div class="aq-pts" style="color:#BA7517">400 pts · TITAN</div></div>
+      <div class="aq-desc">Reduce open ticket backlog by 30% this month. All service teams eligible.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Ares</span><span class="aq-team-tag">Artemis</span><span class="aq-team-tag">Hermes</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>Backlog reduction</span><span style="color:#BA7517;font-weight:600">18% of 30%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:60%;background:#BA7517"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #1D9E75">
+      <div class="aq-top"><div class="aq-name">Ares & Artemis: Battle Brothers</div><div class="aq-pts" style="color:#1D9E75">200 pts · 1.5x</div></div>
+      <div class="aq-desc">Both service teams hit CSAT target AND resolution target in the same week.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Ares</span><span class="aq-team-tag">Artemis</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>Artemis on track · Ares behind</span><span>50%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:50%;background:#1D9E75"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #1D9E75">
+      <div class="aq-top"><div class="aq-name">Demeter Feeds the Army</div><div class="aq-pts" style="color:#1D9E75">175 pts · 1.5x</div></div>
+      <div class="aq-desc">Inventory supplies PST with a needed part proactively before a ticket escalates.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Demeter</span><span class="aq-team-tag">Hephaestus</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>No proactive supply logged yet</span><span>0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#1D9E75"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #378ADD">
+      <div class="aq-top"><div class="aq-name">Wings of Hermes</div><div class="aq-pts" style="color:#378ADD">100 pts</div></div>
+      <div class="aq-desc">Average first response time under 1 hour for all dispatched tickets this week.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Hermes</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>Avg response: 47 min</span><span style="color:#0F6E56;font-weight:600">On track</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:85%;background:#378ADD"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #378ADD">
+      <div class="aq-top"><div class="aq-name">Artemis's Precision</div><div class="aq-pts" style="color:#378ADD">100 pts</div></div>
+      <div class="aq-desc">90%+ first-call resolution rate for the entire week.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Artemis</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>Current FCR: 94%</span><span style="color:#0F6E56;font-weight:600">Completed ✓</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#1D9E75"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #378ADD">
+      <div class="aq-top"><div class="aq-name">Zero SLA Breaches</div><div class="aq-pts" style="color:#378ADD">150 pts</div></div>
+      <div class="aq-desc">Full week with zero SLA breaches across all service tickets.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Ares</span><span class="aq-team-tag">Artemis</span><span class="aq-team-tag">Hermes</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>2 breaches this week</span><span style="color:#993C1D;font-weight:600">At risk</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:70%;background:#E24B4A"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #378ADD">
+      <div class="aq-top"><div class="aq-name">Demeter's Harvest</div><div class="aq-pts" style="color:#378ADD">100 pts</div></div>
+      <div class="aq-desc">100% inventory accuracy — zero discrepancies this week.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Demeter</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>Audit in progress</span><span>75%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:75%;background:#378ADD"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #378ADD">
+      <div class="aq-top"><div class="aq-name">Hephaestus Builds</div><div class="aq-pts" style="color:#378ADD">125 pts</div></div>
+      <div class="aq-desc">Complete and document at least one new process runbook or KB article.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Hephaestus</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>1 draft in progress</span><span>50%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:50%;background:#378ADD"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #378ADD">
+      <div class="aq-top"><div class="aq-name">CSAT Perfection</div><div class="aq-pts" style="color:#378ADD">125 pts</div></div>
+      <div class="aq-desc">Exclusively top-tier CSAT scores for the entire week. Not one complaint.</div>
+      <div class="aq-teams"><span class="aq-team-tag">Ares</span><span class="aq-team-tag">Artemis</span><span class="aq-team-tag">Hermes</span><span class="aq-team-tag">Athena</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>1 low score received</span><span style="color:#993C1D;font-weight:600">Broken</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:30%;background:#E24B4A"></div></div>
+      </div>
+    </div>
+    <div class="aq-card" style="border-left:3px solid #D4537E">
+      <div class="aq-top"><div class="aq-name">Sisyphus's Revenge</div><div class="aq-pts" style="color:#D4537E">100 pts</div></div>
+      <div class="aq-desc">A recurring problem failing for 2+ weeks is finally resolved permanently.</div>
+      <div class="aq-teams"><span class="aq-team-tag">All teams</span></div>
+      <div class="aq-progress">
+        <div class="progress-label"><span>No claims submitted yet</span><span>0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#D4537E"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TEAM TRACKER -->
+<div class="view" id="view-teams">
+  <div class="team-selector" id="teamSelector">
+    <button class="team-btn active" style="background:#7F77DD;border-color:#7F77DD;color:#fff" onclick="selectTeam('artemis',this)"><div class="team-dot-sm" style="background:rgba(255,255,255,0.6)"></div>Artemis</button>
+    <button class="team-btn" onclick="selectTeam('hermes',this)"><div class="team-dot-sm" style="background:#378ADD"></div>Hermes</button>
+    <button class="team-btn" onclick="selectTeam('athena',this)"><div class="team-dot-sm" style="background:#1D9E75"></div>Athena</button>
+    <button class="team-btn" onclick="selectTeam('ares',this)"><div class="team-dot-sm" style="background:#D85A30"></div>Ares</button>
+    <button class="team-btn" onclick="selectTeam('hephaestus',this)"><div class="team-dot-sm" style="background:#EF9F27"></div>Hephaestus</button>
+    <button class="team-btn" onclick="selectTeam('aphrodite',this)"><div class="team-dot-sm" style="background:#D4537E"></div>Aphrodite</button>
+    <button class="team-btn" onclick="selectTeam('demeter',this)"><div class="team-dot-sm" style="background:#5DCAA5"></div>Demeter</button>
+    <button class="team-btn" onclick="selectTeam('zeus',this)"><div class="team-dot-sm" style="background:#3C3489"></div>Zeus</button>
+  </div>
+  <div id="teamDetail"></div>
+</div>
+
+</div>
+
+<script>
+const teamData={
+  artemis:{name:"Artemis",role:"Service Team",color:"#7F77DD",pts:2475,rank:1,quests:16,streak:4,questing:[
+    {name:"Artemis's Precision",pts:100,status:"done",prog:"FCR 94% — complete"},
+    {name:"Ares & Artemis: Battle Brothers",pts:200,status:"prog",prog:"CSAT on track, waiting on Ares"},
+    {name:"Zero SLA Breaches",pts:150,status:"prog",prog:"2 breaches — at risk"},
+    {name:"CSAT Perfection",pts:125,status:"open",prog:"1 low score — broken"},
+    {name:"The Augean Stables (Titan)",pts:400,status:"prog",prog:"18% backlog cleared of 30%"},
+  ]},
+  hermes:{name:"Hermes",role:"Dispatch & Client Success",color:"#378ADD",pts:2150,rank:2,quests:14,streak:3,questing:[
+    {name:"Wings of Hermes",pts:100,status:"done",prog:"Avg 47 min — on track"},
+    {name:"Zero SLA Breaches",pts:150,status:"prog",prog:"2 breaches — at risk"},
+    {name:"Ares & Artemis: Battle Brothers",pts:200,status:"prog",prog:"Supporting cross-team"},
+    {name:"The Augean Stables (Titan)",pts:400,status:"prog",prog:"18% backlog cleared of 30%"},
+  ]},
+  athena:{name:"Athena",role:"Field Service",color:"#1D9E75",pts:1950,rank:3,quests:13,streak:2,questing:[
+    {name:"Athena's Shield",pts:100,status:"done",prog:"Zero return visits this week"},
+    {name:"CSAT Perfection",pts:125,status:"open",prog:"1 low score received — broken"},
+  ]},
+  ares:{name:"Ares",role:"Service Team",color:"#D85A30",pts:1725,rank:4,quests:11,streak:0,questing:[
+    {name:"Ares & Artemis: Battle Brothers",pts:200,status:"prog",prog:"CSAT behind target"},
+    {name:"Ares Rampages",pts:100,status:"prog",prog:"Tracking volume — mid-week"},
+    {name:"The Augean Stables (Titan)",pts:400,status:"prog",prog:"18% backlog cleared of 30%"},
+  ]},
+  hephaestus:{name:"Hephaestus",role:"PST",color:"#EF9F27",pts:1600,rank:5,quests:10,streak:1,questing:[
+    {name:"Hephaestus Builds",pts:125,status:"prog",prog:"1 runbook draft in progress"},
+    {name:"Demeter Feeds the Army",pts:175,status:"open",prog:"No proactive supply yet"},
+  ]},
+  aphrodite:{name:"Aphrodite",role:"Marketing",color:"#D4537E",pts:1375,rank:6,quests:9,streak:0,questing:[
+    {name:"Aphrodite's Golden Apple",pts:125,status:"prog",prog:"Campaign running — 1 lead so far"},
+  ]},
+  demeter:{name:"Demeter",role:"Inventory",color:"#5DCAA5",pts:1200,rank:7,quests:8,streak:2,questing:[
+    {name:"Demeter's Harvest",pts:100,status:"prog",prog:"Audit 75% complete"},
+    {name:"Demeter Feeds the Army",pts:175,status:"open",prog:"No proactive supply logged yet"},
+  ]},
+  zeus:{name:"Zeus",role:"Leadership",color:"#3C3489",pts:1050,rank:8,quests:7,streak:0,questing:[
+    {name:"Zeus Decrees",pts:150,status:"open",prog:"No communication published yet"},
+  ]},
+};
+
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('view-'+tab).classList.add('active');
+}
+
+function selectTeam(key,btn){
+  document.querySelectorAll('.team-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';b.style.color='';});
+  const t=teamData[key];
+  btn.classList.add('active');
+  btn.style.background=t.color;btn.style.borderColor=t.color;btn.style.color='#fff';
+  const si={done:'✓',prog:'→',open:'○'};
+  const sc={done:'done',prog:'prog',open:'open'};
+  document.getElementById('teamDetail').innerHTML=`
+    <div class="team-detail">
+      <div class="td-header">
+        <div class="td-icon" style="background:${t.color}">${t.name.substring(0,2)}</div>
+        <div><div class="td-name">${t.name}</div><div class="td-role">${t.role} · Rank #${t.rank} this season</div></div>
+      </div>
+      <div class="td-stats">
+        <div class="td-stat"><div class="td-stat-num" style="color:${t.color}">${t.pts.toLocaleString()}</div><div class="td-stat-lbl">Season points</div></div>
+        <div class="td-stat"><div class="td-stat-num">${t.quests}</div><div class="td-stat-lbl">Quests done</div></div>
+        <div class="td-stat"><div class="td-stat-num">${t.streak}</div><div class="td-stat-lbl">Win streak</div></div>
+        <div class="td-stat"><div class="td-stat-num">${t.questing.length}</div><div class="td-stat-lbl">Active this week</div></div>
+      </div>
+      <div class="td-quests-title">This week's selected quests</div>
+      ${t.questing.map(q=>`
+        <div class="td-quest-item">
+          <div class="td-q-status ${sc[q.status]}">${si[q.status]}</div>
+          <div class="td-q-name">${q.name}</div>
+          <div class="td-q-pts">${q.pts} pts</div>
+          <div class="td-q-prog">${q.prog}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+renderTeam=function(k){selectTeam(k,document.querySelector('.team-btn'))};
+renderTeam('artemis');
+</script>
+</body>
+</html>
