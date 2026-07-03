@@ -299,7 +299,10 @@ const msalConfig = {
 };
 
 const loginRequest = {
-  scopes: ["https://omegacomputerservices.sharepoint.com/.default"]
+  scopes: [
+    "https://graph.microsoft.com/Sites.Read.All",
+    "https://graph.microsoft.com/User.Read"
+  ]
 };
 
 let msalInstance = null;
