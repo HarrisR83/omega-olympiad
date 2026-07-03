@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trials of Olympus — Omega Computer Services</title>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: radial-gradient(circle at top left, #1B2A52 0%, #0B1020 45%, #050711 100%); min-height: 100vh; color: #fff; font-family: 'Inter', system-ui, sans-serif; font-size: 14px; line-height: 1.4; overflow-x: hidden; }
+
+  .page { padding: 12px; max-width: 1800px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .grid-12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+  .col-6 { grid-column: span 6; }
+  .col-3 { grid-column: span 3; }
+
+  .panel { border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(17,25,51,0.95); box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: hidden; }
+  .panel-header { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .panel-title { font-size: 16px; font-weight: 900; letter-spacing: -0.02em; }
+  .panel-subtitle { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; }
+  .panel-body { padding: 12px; }
+  .panel-body-gap { display: flex; flex-direction: column; gap: 8px; }
+
+  .main-header { border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .header-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.35em; color: #fcd34d; }
+  .header-title { font-size: 32px; font-weight: 900; letter-spacing: -0.03em; }
+  .header-stats { display: grid; grid-template-columns: repeat(4, auto); gap: 8px; align-items: center; }
+  .stat-box { border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; text-align: center; min-width: 80px; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+  .stat-value { font-size: 20px; font-weight: 900; margin-top: 2px; }
+  .sync-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #94a3b8; }
+  .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .alert-banner { border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; }
+  .alert-type { font-size: 10px; text-transform: uppercase; letter-spacing: 0.35em; color: #cbd5e1; }
+  .alert-msg { font-size: 22px; font-weight: 900; margin-top: 2px; letter-spacing: -0.02em; }
+
+  .lb-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+  .lb-card { border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-height: 90px; }
+  .lb-rank { font-size: 10px; color: #cbd5e1; }
+  .lb-icon { font-size: 20px; }
+  .lb-name { font-size: 11px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lb-points { font-size: 26px; font-weight: 900; }
+  .lb-delta { font-size: 11px; font-weight: 700; }
+
+  .team-ARES       { background: linear-gradient(135deg,rgba(239,68,68,0.3),rgba(127,29,29,0.2)); border: 1px solid rgba(248,113,113,0.4); }
+  .team-ARTEMIS    { background: linear-gradient(135deg,rgba(168,85,247,0.3),rgba(88,28,135,0.2)); border: 1px solid rgba(192,132,252,0.4); }
+  .team-HERMES     { background: linear-gradient(135deg,rgba(14,165,233,0.3),rgba(12,74,110,0.2)); border: 1px solid rgba(56,189,248,0.4); }
+  .team-ATHENA     { background: linear-gradient(135deg,rgba(234,179,8,0.3),rgba(113,63,18,0.2)); border: 1px solid rgba(250,204,21,0.4); }
+  .team-DEMETER    { background: linear-gradient(135deg,rgba(34,197,94,0.3),rgba(20,83,45,0.2)); border: 1px solid rgba(74,222,128,0.4); }
+  .team-HEPHAESTUS { background: linear-gradient(135deg,rgba(249,115,22,0.3),rgba(124,45,18,0.2)); border: 1px solid rgba(251,146,60,0.4); }
+  .team-APHRODITE  { background: linear-gradient(135deg,rgba(236,72,153,0.3),rgba(131,24,67,0.2)); border: 1px solid rgba(244,114,182,0.4); }
+  .team-ZEUS       { background: linear-gradient(135deg,rgba(59,130,246,0.3),rgba(30,58,138,0.2)); border: 1px solid rgba(96,165,250,0.4); }
+  .team-default    { background: linear-gradient(135deg,rgba(100,116,139,0.3),rgba(51,65,85,0.2)); border: 1px solid rgba(148,163,184,0.4); }
+
+  .accent-ARES { color:#fca5a5; } .accent-ARTEMIS { color:#d8b4fe; } .accent-HERMES { color:#7dd3fc; }
+  .accent-ATHENA { color:#fde68a; } .accent-DEMETER { color:#86efac; } .accent-HEPHAESTUS { color:#fdba74; }
+  .accent-APHRODITE { color:#f9a8d4; } .accent-ZEUS { color:#93c5fd; } .accent-default { color:#cbd5e1; }
+
+  .quest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quest-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; cursor: pointer; transition: background 0.15s, border-color 0.15s; text-align: left; color: inherit; width: 100%; }
+  .quest-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(252,211,77,0.4); }
+  .quest-name { font-size: 13px; font-weight: 800; }
+  .quest-desc { font-size: 11px; color: #94a3b8; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .quest-pts { font-size: 13px; font-weight: 900; color: #fcd34d; }
+  .quest-right { text-align: right; flex-shrink: 0; }
+
+  .pill { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 9999px; }
+  .pill-Easy       { background: rgba(16,185,129,0.2); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.3); }
+  .pill-Medium     { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(251,191,36,0.3); }
+  .pill-Alliance   { background: rgba(14,165,233,0.2); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.3); }
+  .pill-Multiplier { background: rgba(244,63,94,0.2);  color: #fda4af; border: 1px solid rgba(251,113,133,0.3); }
+
+  .progress-track { height: 7px; border-radius: 9999px; background: rgba(255,255,255,0.1); overflow: hidden; margin-top: 8px; }
+  .progress-fill  { height: 100%; border-radius: 9999px; background: linear-gradient(to right, #fcd34d, #f97316); }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+  .claimed-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; }
+  .claimed-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .claimed-team { font-size: 13px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+  .claimed-quest { font-size: 12px; color: #e2e8f0; }
+  .claimed-owner { font-size: 11px; color: #94a3b8; }
+  .claimed-status { font-size: 11px; font-weight: 700; color: #fcd34d; white-space: nowrap; }
+
+  .multiplier-card { background: rgba(244,63,94,0.1); border: 1px solid rgba(253,164,175,0.2); border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .multiplier-title { font-size: 13px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+  .multiplier-status { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .multiplier-pts { font-size: 16px; font-weight: 900; color: #fda4af; }
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 4px 0; }
+  .monthly-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; display: flex; gap: 10px; align-items: flex-start; }
+  .monthly-icon { font-size: 22px; flex-shrink: 0; }
+  .monthly-title { font-size: 13px; font-weight: 900; }
+  .monthly-desc  { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+  .feast-panel { border-radius: 16px; overflow: hidden; border: 1px solid rgba(252,211,77,0.3); background: linear-gradient(135deg, rgba(17,25,51,0.98) 0%, rgba(30,20,5,0.95) 100%); box-shadow: 0 0 40px rgba(252,211,77,0.08); }
+  .feast-header { padding: 10px 16px; border-bottom: 1px solid rgba(252,211,77,0.2); display: flex; align-items: center; justify-content: space-between; background: rgba(252,211,77,0.06); }
+  .feast-title { font-size: 16px; font-weight: 900; letter-spacing: -0.02em; color: #fcd34d; }
+  .feast-subtitle { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #92400e; }
+  .feast-body { padding: 14px 16px; display: flex; align-items: center; gap: 16px; }
+  .feast-icon { font-size: 40px; flex-shrink: 0; }
+  .feast-info { flex: 1; min-width: 0; }
+  .feast-month { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #d97706; margin-bottom: 4px; }
+  .feast-team { font-size: 26px; font-weight: 900; letter-spacing: -0.03em; color: #fcd34d; }
+  .feast-duty { font-size: 11px; color: #94a3b8; margin-top: 4px; line-height: 1.5; }
+  .feast-badge { font-size: 10px; padding: 3px 10px; border-radius: 9999px; background: rgba(252,211,77,0.15); border: 1px solid rgba(252,211,77,0.3); color: #fcd34d; white-space: nowrap; flex-shrink: 0; }
+
+  /* Auth screen */
+  .auth-screen { position: fixed; inset: 0; background: radial-gradient(circle at top left, #1B2A52 0%, #0B1020 45%, #050711 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; z-index: 100; }
+  .auth-logo { font-size: 48px; }
+  .auth-title { font-size: 36px; font-weight: 900; color: #fcd34d; letter-spacing: -0.03em; }
+  .auth-sub { font-size: 14px; color: #94a3b8; }
+  .auth-btn { background: #fcd34d; color: #0B1020; font-size: 15px; font-weight: 800; padding: 14px 32px; border-radius: 12px; border: none; cursor: pointer; letter-spacing: -0.01em; transition: opacity 0.15s; }
+  .auth-btn:hover { opacity: 0.85; }
+  .auth-error { font-size: 13px; color: #fca5a5; max-width: 400px; text-align: center; }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal-box { width: 100%; max-width: 640px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); background: #111933; box-shadow: 0 40px 120px rgba(0,0,0,0.8); overflow: hidden; }
+  .modal-head { background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 20px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .modal-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.35em; color: #fcd34d; }
+  .modal-name { font-size: 26px; font-weight: 900; margin-top: 4px; }
+  .modal-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+  .modal-close { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: rgba(255,255,255,0.2); }
+  .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .modal-desc { font-size: 16px; color: #e2e8f0; line-height: 1.6; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; }
+  .info-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; }
+  .info-value { font-size: 13px; font-weight: 600; margin-top: 4px; }
+  .info-block { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; }
+  .info-block-highlight { background: rgba(252,211,77,0.08); border-color: rgba(252,211,77,0.2); }
+  .info-block-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 6px; }
+  .info-block-label-gold { color: #fcd34d; }
+  .info-block-value { font-size: 13px; color: #f1f5f9; line-height: 1.6; }
+
+  .hidden { display: none !important; }
+  .fade-in { animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+  .text-gold { color: #fcd34d; }
+  .text-muted { color: #94a3b8; }
+  .empty-state { color: #64748b; font-size: 13px; padding: 16px 0; }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-logo">⚡</div>
+  <div class="auth-title">Trials of Olympus</div>
+  <div class="auth-sub">Sign in with your Omega Computer Services account to continue</div>
+  <button class="auth-btn" onclick="signIn()">Sign in with Microsoft</button>
+  <div class="auth-error hidden" id="auth-error"></div>
+</div>
+
+<!-- DASHBOARD (hidden until auth) -->
+<div class="page hidden" id="dashboard">
+
+  <header class="main-header">
+    <div>
+      <div class="header-eyebrow">Omega Computer Services</div>
+      <div class="header-title">Trials of Olympus</div>
+    </div>
+    <div class="header-stats">
+      <div class="sync-row">
+        <div class="pulse-dot" id="sync-dot"></div>
+        <span id="sync-label">Connecting…</span>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Quarter</div>
+        <div class="stat-value text-gold" id="hdr-quarter">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Week</div>
+        <div class="stat-value" id="hdr-week">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Days Left</div>
+        <div class="stat-value" style="color:#4ade80;" id="hdr-days">—</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="alert-banner" id="alert-banner" style="background:rgba(255,255,255,0.05);">
+    <div class="alert-type" id="alert-type">Loading…</div>
+    <div class="alert-msg" id="alert-msg">Fetching live data from SharePoint…</div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">🏆 Leaderboard</div>
+      <div class="panel-subtitle">This Week</div>
+    </div>
+    <div class="panel-body">
+      <div class="lb-grid" id="leaderboard-grid">
+        <div style="grid-column:span 8;text-align:center;color:#64748b;padding:20px 0;font-size:13px;">Loading scores…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-12">
+    <div class="col-6">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">⚡ Quest Options</div>
+          <div class="panel-subtitle" id="quest-page-label">Loading…</div>
+        </div>
+        <div class="panel-body">
+          <div class="quest-grid" id="quest-grid">
+            <div style="grid-column:span 2;text-align:center;color:#64748b;padding:20px 0;font-size:13px;">Loading quests…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="panel" style="height:100%;">
+        <div class="panel-header">
+          <div class="panel-title">🤝 Claimed</div>
+          <div class="panel-subtitle">Who Owns What</div>
+        </div>
+        <div class="panel-body panel-body-gap" id="claimed-panel">
+          <div class="empty-state">Loading…</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="panel" style="height:100%;">
+        <div class="panel-header">
+          <div class="panel-title">🔥 Big Plays</div>
+          <div class="panel-subtitle">High Impact</div>
+        </div>
+        <div class="panel-body panel-body-gap" id="bigplays-panel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feast-panel">
+    <div class="feast-header">
+      <div class="feast-title">⚜️ Providers of the Feast</div>
+      <div class="feast-subtitle">Monthly Honor</div>
+    </div>
+    <div class="feast-body">
+      <div class="feast-icon">🍽️</div>
+      <div class="feast-info">
+        <div class="feast-month" id="feast-month">—</div>
+        <div class="feast-team" id="feast-team">—</div>
+        <div class="feast-duty">Responsible for the team luncheon &amp; kitchen cleanliness for the entire month. This honor rotates each month — no team repeats back-to-back.</div>
+      </div>
+      <div class="feast-badge" id="feast-badge">—</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- QUEST MODAL -->
+<div class="modal-backdrop hidden" id="modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div>
+        <div class="modal-eyebrow">Quest Details</div>
+        <div class="modal-name" id="modal-title">—</div>
+        <div class="modal-meta">
+          <span id="modal-level-badge" class="pill">—</span>
+          <span id="modal-points" class="text-gold" style="font-size:13px;font-weight:700;">—</span>
+          <span id="modal-status-text" class="text-muted" style="font-size:13px;">—</span>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-desc" id="modal-desc">—</div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#94a3b8;"><span>Progress</span><span id="modal-progress-pct">0%</span></div>
+        <div class="progress-track" style="margin-top:6px;"><div class="progress-fill" id="modal-progress-bar" style="width:0%"></div></div>
+      </div>
+      <div class="info-grid">
+        <div class="info-card"><div class="info-label">Owner</div><div class="info-value" id="modal-owner">—</div></div>
+        <div class="info-card"><div class="info-label">Deadline</div><div class="info-value" id="modal-deadline">—</div></div>
+      </div>
+      <div class="info-block"><div class="info-block-label">Success Criteria</div><div class="info-block-value" id="modal-criteria">—</div></div>
+      <div class="info-block"><div class="info-block-label">Proof Required</div><div class="info-block-value" id="modal-proof">—</div></div>
+      <div class="info-block info-block-highlight"><div class="info-block-label info-block-label-gold">How to Submit</div><div class="info-block-value" id="modal-submit">—</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── MSAL CONFIG ───────────────────────────────────────────
+const msalConfig = {
+  auth: {
+    clientId:    "5533ce57-69e3-4577-bdcc-a4a125f17457",
+    authority:   "https://login.microsoftonline.com/8ea7dc21-8260-4e03-9a09-913e6cf5b330",
+    redirectUri: window.location.origin + window.location.pathname,
+  },
+  cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
+};
+
+const loginRequest = {
+  scopes: ["https://omegacomputerservices.sharepoint.com/.default"]
+};
+
+const msalInstance = new msal.PublicClientApplication(msalConfig);
+let accessToken = null;
+
+async function signIn() {
+  try {
+    document.getElementById("auth-error").classList.add("hidden");
+    const result = await msalInstance.loginPopup(loginRequest);
+    msalInstance.setActiveAccount(result.account);
+    await acquireToken();
+    showDashboard();
+  } catch(e) {
+    const err = document.getElementById("auth-error");
+    err.textContent = "Sign in failed: " + (e.message || e);
+    err.classList.remove("hidden");
+  }
+}
+
+async function acquireToken() {
+  try {
+    const result = await msalInstance.acquireTokenSilent({
+      ...loginRequest,
+      account: msalInstance.getActiveAccount()
+    });
+    accessToken = result.accessToken;
+  } catch(e) {
+    const result = await msalInstance.acquireTokenPopup(loginRequest);
+    accessToken = result.accessToken;
+  }
+}
+
+async function handleRedirect() {
+  await msalInstance.handleRedirectPromise();
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length > 0) {
+    msalInstance.setActiveAccount(accounts[0]);
+    try {
+      await acquireToken();
+      showDashboard();
+    } catch(e) { /* show auth screen */ }
+  }
+}
+
+function showDashboard() {
+  document.getElementById("auth-screen").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  initDashboard();
+}
+
+// ── CONFIG ────────────────────────────────────────────────
+const SITE_HOST   = "omegacomputerservices.sharepoint.com";
+const SITE_PATH   = "/sites/OmegaTrials";
+const LIST_SCORES = "e9f69cb7-1e7c-47f3-855e-96bdb6f61ad7";
+const LIST_QUESTS = "7fa89b46-7f20-4cee-bf99-dc41a1debf4b";
+const REFRESH_MS  = 60000;
+
+// ── STATIC QUEST DATA ─────────────────────────────────────
+const QUEST_DETAILS = {
+  "hydra-slayer":          { icon:"🐉", level:"Easy",       points:10,  name:"Hydra Slayer",         desc:"Reduce one recurring ticket type by 50%.",                             owner:"Service Desk",                         deadline:"Friday at 4:00 PM",                     successCriteria:"Identify a ticket type with at least 5 occurrences this week, implement a fix, and reduce repeat tickets by 50%.",                                                                                       proofRequired:"Freshdesk ticket list, quest tag report, and a short summary of the fix.",              submitPath:"Freshdesk tag: Quest_HydraSlayer" },
+  "perfect-flow":          { icon:"📨", level:"Easy",       points:10,  name:"Perfect Flow",          desc:"No missed follow-ups for one business day.",                           owner:"Dispatch / Hermes",                    deadline:"End of business day",                   successCriteria:"All required follow-ups are completed on time with no stale tickets missed during business hours.",                                                                                                    proofRequired:"Follow-up queue audit or Freshdesk report.",                                            submitPath:"Teams quest submission + follow-up report" },
+  "story-forge":           { icon:"📣", level:"Medium",     points:15,  name:"Story Forge",           desc:"Turn one solved issue into published content.",                        owner:"Marketing / Aphrodite",                deadline:"Friday at noon",                        successCriteria:"Use one real solved client issue to create an approved LinkedIn post, blog, or internal success story.",                                                                                               proofRequired:"Published content link and source ticket number.",                                       submitPath:"Marketing quest form" },
+  "perfect-deployment":    { icon:"🤝", level:"Alliance",   points:25,  name:"Perfect Deployment",    desc:"Inventory + Dispatch + Field complete an install with zero issues.",   owner:"Inventory + Dispatch + Field",         deadline:"72 hours after install",                successCriteria:"Inventory stages equipment 24 hours before install, Dispatch schedules without reschedule, Field completes install, and no follow-up ticket is created within 72 hours.",                              proofRequired:"Install ticket, staging checklist, schedule notes, and 72-hour follow-up check.",        submitPath:"Linked project/install ticket" },
+  "revenue-loop":          { icon:"💰", level:"Multiplier", points:40,  name:"Revenue Loop",          desc:"Client meeting creates 3 tickets that close within 3 business days.",  owner:"Account Manager + Service",            deadline:"3 business days after ticket creation", successCriteria:"AM meets with a client, identifies at least 3 actionable issues, creates tickets within 24 hours, and all 3 are closed within 3 business days with no reopen for 72 hours.",                         proofRequired:"Meeting note, three ticket IDs, closure timestamps, and reopen check.",                 submitPath:"Quest submission form + ticket IDs" },
+  "client-voice":          { icon:"💬", level:"Medium",     points:15,  name:"Client Voice",          desc:"Capture one usable client quote or testimonial.",                      owner:"Marketing / Aphrodite",                deadline:"Friday at noon",                        successCriteria:"Capture one approved client quote tied to a real outcome, project, ticket, or service improvement.",                                                                                                   proofRequired:"Client approval, quote, and source context.",                                           submitPath:"Marketing quest form" },
+  "campaign-from-pain":    { icon:"🎯", level:"Medium",     points:20,  name:"Campaign From Pain",    desc:"Turn a real client pain point into a campaign idea.",                  owner:"Marketing / Sales",                    deadline:"Friday 3:00 PM",                        successCriteria:"Identify a repeated client issue and create one campaign concept, email draft, or sales enablement piece.",                                                                                            proofRequired:"Source tickets plus campaign draft/link.",                                              submitPath:"Marketing quest form" },
+  "lead-spark":            { icon:"🧲", level:"Medium",     points:20,  name:"Lead Spark",            desc:"Create 3 meaningful sales touches from service insights.",             owner:"Sales / Marketing",                    deadline:"Friday 4:00 PM",                        successCriteria:"Use ticket/project/customer insight to create 3 targeted follow-ups or outreach opportunities.",                                                                                                      proofRequired:"CRM entries or outreach log.",                                                          submitPath:"CRM + quest submission" },
+  "ready-rack":            { icon:"📦", level:"Easy",       points:10,  name:"Ready Rack",            desc:"Prep 5 devices ahead of demand.",                                      owner:"Inventory / Demeter",                  deadline:"Friday 4:00 PM",                        successCriteria:"Five devices are fully prepped, labeled, assigned correctly, and ready before they are urgently needed.",                                                                                             proofRequired:"Asset records and prep checklist.",                                                     submitPath:"Inventory tracker + quest submission" },
+  "asset-cleanup":         { icon:"🌾", level:"Easy",       points:10,  name:"Asset Cleanup",         desc:"Fix 10 asset record issues.",                                          owner:"Inventory / Demeter",                  deadline:"Friday 4:00 PM",                        successCriteria:"Correct 10 inaccurate, missing, or mismatched asset records.",                                                                                                                                     proofRequired:"Before/after asset list.",                                                              submitPath:"Inventory quest form" },
+  "install-kit":           { icon:"🧰", level:"Alliance",   points:25,  name:"Perfect Kit",           desc:"Build a complete install kit with zero missing parts.",                owner:"Inventory + Field / Demeter + Athena", deadline:"Before install day",                    successCriteria:"All equipment, cables, labels, and notes are prepared before Field arrives onsite.",                                                                                                               proofRequired:"Checklist plus install ticket confirmation.",                                            submitPath:"Linked install ticket" },
+  "field-intel":           { icon:"🦉", level:"Medium",     points:15,  name:"Field Intel",           desc:"Bring back 2 useful client environment findings.",                     owner:"Field Service / Athena",               deadline:"Friday 4:00 PM",                        successCriteria:"Identify two issues, risks, or improvement opportunities while onsite and log them clearly.",                                                                                                        proofRequired:"Ticket IDs or project notes.",                                                          submitPath:"Freshdesk / project notes" },
+  "clean-handoff":         { icon:"🤲", level:"Alliance",   points:25,  name:"Clean Handoff",         desc:"Project handoff to Service with no missing support info.",             owner:"PST + Service / Hephaestus",           deadline:"Before project close",                  successCriteria:"Service Desk confirms they have documentation, passwords/locations, support notes, and known issues.",                                                                                               proofRequired:"Handoff checklist signed by Service lead.",                                             submitPath:"Project ticket / handoff form" },
+  "automation-bounty":     { icon:"⚒️", level:"Multiplier", points:45,  name:"Automation Bounty",     desc:"Build automation that reduces a repeat task.",                         owner:"PST / Automation",                     deadline:"Monthly",                               successCriteria:"Automation reduces a repeated task or ticket category and has a measurable before/after impact.",                                                                                                    proofRequired:"Automation link plus before/after counts.",                                             submitPath:"Automation quest submission" },
+  "zeus-removes-roadblock":{ icon:"⚡", level:"Medium",     points:20,  name:"Remove the Roadblock",  desc:"Leadership removes one blocker slowing a team down.",                 owner:"Leadership / Zeus",                    deadline:"Friday 4:00 PM",                        successCriteria:"Identify one blocker raised by a team and remove it or make a clear decision that moves work forward.",                                                                                              proofRequired:"Before/after note and impacted team confirmation.",                                     submitPath:"Leadership quest log" },
+  "shoutout-storm":        { icon:"🏅", level:"Easy",       points:10,  name:"Shoutout Storm",        desc:"Leadership recognizes 3 specific team wins.",                          owner:"Leadership / Zeus",                    deadline:"Friday meeting",                        successCriteria:"Recognize 3 specific wins tied to behavior we want repeated, not generic compliments.",                                                                                                             proofRequired:"Teams post or meeting notes.",                                                          submitPath:"Leadership quest log" },
+  "dispatch-clean-queue":  { icon:"👟", level:"Easy",       points:10,  name:"Clean Queue",           desc:"No stale unassigned tickets older than 30 minutes.",                  owner:"Dispatch / Hermes",                    deadline:"One business day",                      successCriteria:"All new tickets are triaged and assigned within the agreed window for a full business day.",                                                                                                         proofRequired:"Freshdesk queue report.",                                                               submitPath:"Freshdesk report + quest tag" },
+};
+
+const TEAMS = ["ARES","ARTEMIS","HERMES","ATHENA","DEMETER","HEPHAESTUS","APHRODITE","ZEUS"];
+
+const MONTHLY_TRIALS = [
+  { icon:"🐉", title:"Slay the Hydra",     desc:"Eliminate a top recurring issue this month." },
+  { icon:"🏗️", title:"Rebuild the Temple", desc:"Fix one broken internal workflow." },
+  { icon:"🛡️", title:"Shield of Athena",   desc:"Identify and fix one real security risk." },
+];
+
+const MULTIPLIERS = [
+  { icon:"💰", title:"Revenue Loop",      points:40, id:"revenue-loop" },
+  { icon:"🚨", title:"Save the Account",  points:50, id:null },
+  { icon:"🚀", title:"Transformation Win",points:75, id:null },
+];
+
+const ALERT_STYLES = {
+  WIN:        "background:linear-gradient(to right,rgba(52,211,153,0.2),transparent);border-color:rgba(110,231,183,0.2);",
+  "NEAR WIN": "background:linear-gradient(to right,rgba(251,191,36,0.2),transparent);border-color:rgba(252,211,77,0.2);",
+  RACE:       "background:linear-gradient(to right,rgba(56,189,248,0.2),transparent);border-color:rgba(125,211,252,0.2);",
+  UNCLAIMED:  "background:linear-gradient(to right,rgba(244,63,94,0.2),transparent);border-color:rgba(253,164,175,0.2);",
+  EXPIRING:   "background:linear-gradient(to right,rgba(249,115,22,0.2),transparent);border-color:rgba(253,186,116,0.2);",
+  BOTTLENECK: "background:linear-gradient(to right,rgba(239,68,68,0.2),transparent);border-color:rgba(252,165,165,0.2);",
+};
+
+// ── STATE ─────────────────────────────────────────────────
+let liveScores = [], liveQuestState = {}, alertIndex = 0, questPage = 0, lastUpdated = null;
+
+// ── GRAPH API FETCH (with MSAL token) ────────────────────
+async function fetchList(listId) {
+  await acquireToken();
+  const url = `https://graph.microsoft.com/v1.0/sites/${SITE_HOST}:${SITE_PATH}:/lists/${listId}/items?expand=fields&$top=100`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}`, Accept: "application/json" } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return (await res.json()).value.map(i => i.fields);
+}
+
+async function loadSharePointData() {
+  try {
+    const [scoreRows, questRows] = await Promise.all([
+      fetchList(LIST_SCORES),
+      fetchList(LIST_QUESTS),
+    ]);
+    liveScores = scoreRows.map(r => ({
+      team: (r.Title||"").toUpperCase(), icon: r.TeamIcon||"⚡",
+      points: r.Points||0, delta: r.WeeklyDelta>0?`+${r.WeeklyDelta}`:String(r.WeeklyDelta||0), rank: r.Rank||99,
+    })).sort((a,b)=>a.rank-b.rank);
+    liveQuestState = {};
+    questRows.forEach(r => { if(r.QuestID) liveQuestState[r.QuestID] = { claimedByTeam:r.ClaimedByTeam||"", claimedByPerson:r.ClaimedByPerson||"", progress:r.Progress||0, status:r.Status||"Available", statusNote:r.StatusNote||r.Status||"Available" }; });
+    lastUpdated = new Date();
+    setSyncStatus(true);
+    renderAll();
+  } catch(err) {
+    console.error("SP fetch error:", err);
+    setSyncStatus(false);
+    if (!liveScores.length) renderFallback();
+  }
+}
+
+function setSyncStatus(ok) {
+  document.getElementById("sync-dot").style.background = ok ? "#4ade80" : "#f87171";
+  document.getElementById("sync-label").textContent = ok
+    ? `Live · ${lastUpdated.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`
+    : "Offline — last known data";
+}
+
+// ── QUARTER ───────────────────────────────────────────────
+function getQuarterStatus() {
+  const d = new Date(), q = Math.floor(d.getMonth()/3)+1;
+  const qs = new Date(d.getFullYear(),(q-1)*3,1), qe = new Date(d.getFullYear(),q*3,0);
+  return { quarter:`Q${q}`, weekOfQuarter:Math.floor((d-qs)/604800000)+1, daysLeft:Math.max(0,Math.ceil((qe-d)/86400000)) };
+}
+
+// ── FEAST ─────────────────────────────────────────────────
+function getFeastTeam() {
+  const now = new Date(), year = now.getFullYear(), month = now.getMonth();
+  function seededShuffle(arr, seed) {
+    const a=[...arr]; let s=seed;
+    for(let i=a.length-1;i>0;i--){s=(s*1664525+1013904223)&0xffffffff;const j=Math.abs(s)%(i+1);[a[i],a[j]]=[a[j],a[i]];}
+    return a;
+  }
+  const shuffled = seededShuffle(TEAMS, year);
+  const extended = [];
+  for(let i=0;i<12;i++){const c=shuffled[i%shuffled.length];if(extended.length>0&&extended[extended.length-1]===c){extended.push(shuffled[(i+1)%shuffled.length]);}else{extended.push(c);}}
+  return { team:extended[month], monthName:now.toLocaleString("default",{month:"long"}), monthNum:month+1 };
+}
+
+function renderFeast() {
+  const { team, monthName, monthNum } = getFeastTeam();
+  document.getElementById("feast-month").textContent = `${monthName.toUpperCase()} ${new Date().getFullYear()}`;
+  document.getElementById("feast-team").textContent  = team;
+  document.getElementById("feast-badge").textContent = `Month ${monthNum} of 8`;
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderAll() {
+  renderHeader(); renderLeaderboard(); renderQuestPage(); renderClaimed(); renderBigPlays(); renderAlerts();
+}
+
+function renderHeader() {
+  const q = getQuarterStatus();
+  document.getElementById("hdr-quarter").textContent = q.quarter;
+  document.getElementById("hdr-week").textContent    = q.weekOfQuarter;
+  document.getElementById("hdr-days").textContent    = q.daysLeft;
+}
+
+function renderLeaderboard() {
+  const g = document.getElementById("leaderboard-grid");
+  if (!liveScores.length) { g.innerHTML=`<div style="grid-column:span 8;text-align:center;color:#64748b;padding:20px 0;font-size:13px;">No score data yet.</div>`; return; }
+  g.innerHTML = liveScores.map(t => {
+    const tc=`team-${t.team}`, ac=`accent-${t.team}`;
+    return `<div class="lb-card ${tc} fade-in">
+      <div style="display:flex;align-items:center;justify-content:space-between;"><div class="lb-icon">${t.icon}</div><div class="lb-rank">#${t.rank}</div></div>
+      <div class="lb-name">${t.team}</div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;"><div class="lb-points">${t.points}</div><div class="lb-delta ${ac}">${t.delta}</div></div>
+    </div>`;
+  }).join("");
+}
+
+function getQuestList() {
+  return Object.entries(QUEST_DETAILS).map(([id,q]) => {
+    const live=liveQuestState[id]||{};
+    return { id,...q, progress:live.progress||0, statusNote:live.statusNote||live.status||"Available", liveStatus:live.status||"Available" };
+  });
+}
+
+function renderQuestPage() {
+  const quests=getQuestList(), total=Math.ceil(quests.length/6);
+  if(questPage>=total) questPage=0;
+  const visible=quests.slice(questPage*6,questPage*6+6);
+  document.getElementById("quest-page-label").textContent=`Rotating ${questPage+1}/${total}`;
+  document.getElementById("quest-grid").innerHTML=visible.map(q=>`
+    <button class="quest-card fade-in" onclick="openModal('${q.id}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+        <div style="min-width:0;"><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:18px;">${q.icon}</span><span class="quest-name">${q.name}</span></div><div class="quest-desc">${q.desc}</div></div>
+        <div class="quest-right"><div class="quest-pts">${q.points}</div><span class="pill pill-${q.level}">${q.level}</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${q.progress}%"></div></div>
+      <div class="progress-labels"><span>${q.progress}%</span><span>${q.statusNote}</span></div>
+    </button>`).join("");
+}
+
+function renderClaimed() {
+  const claimed=Object.entries(liveQuestState).filter(([,v])=>v.status==="Claimed"&&v.claimedByTeam).map(([id,v])=>({id,...QUEST_DETAILS[id],...v}));
+  const p=document.getElementById("claimed-panel");
+  if(!claimed.length){p.innerHTML=`<div class="empty-state">No quests claimed yet.</div>`;return;}
+  p.innerHTML=claimed.map(c=>`
+    <div class="claimed-card fade-in">
+      <div class="claimed-top"><div><div class="claimed-team"><span>${c.icon||"⚡"}</span>${c.claimedByTeam}</div><div class="claimed-quest">${c.name||c.id}</div><div class="claimed-owner">Owner: ${c.claimedByPerson||"—"}</div></div><div class="claimed-status">${c.statusNote||"Claimed"}</div></div>
+      <div class="progress-track"><div class="progress-fill" style="width:${c.progress}%"></div></div>
+      <div class="progress-labels"><span>${c.progress}% complete</span></div>
+    </div>`).join("");
+}
+
+function renderBigPlays() {
+  const mults=MULTIPLIERS.map(m=>{const live=m.id?liveQuestState[m.id]:null;return`<div class="multiplier-card"><div><div class="multiplier-title"><span>${m.icon}</span>${m.title}</div><div class="multiplier-status">${live?(live.statusNote||live.status):"Unclaimed"}</div></div><div class="multiplier-pts">${m.points}</div></div>`;}).join("");
+  const trials=MONTHLY_TRIALS.map(t=>`<div class="monthly-card"><div class="monthly-icon">${t.icon}</div><div><div class="monthly-title">${t.title}</div><div class="monthly-desc">${t.desc}</div></div></div>`).join("");
+  document.getElementById("bigplays-panel").innerHTML=mults+`<hr class="divider">`+trials;
+}
+
+function buildAlerts() {
+  const alerts=[],scores=[...liveScores].sort((a,b)=>a.rank-b.rank),quests=getQuestList();
+  if(scores.length>=2) alerts.push({type:"RACE",label:"Leaderboard Pressure",msg:`${scores[1].team} is ${scores[0].points-scores[1].points} pts behind ${scores[0].team}`});
+  if(scores.length>=1&&scores[0].delta!=="0") alerts.push({type:"WIN",label:"Leading Team",msg:`${scores[0].team} leads with ${scores[0].points} pts (${scores[0].delta} this week)`});
+  quests.forEach(q=>{
+    if(q.liveStatus==="Claimed"&&q.progress>=75) alerts.push({type:"NEAR WIN",label:"Almost There",msg:`${q.name} is ${q.progress}% complete — almost done!`});
+    if(q.liveStatus==="Available"&&q.points>=25) alerts.push({type:"UNCLAIMED",label:"Open Opportunity",msg:`${q.name} is unclaimed (+${q.points} pts)`});
+  });
+  if(!alerts.length) alerts.push({type:"RACE",label:"Season Active",msg:"Trials of Olympus is underway — claim your quests!"});
+  return alerts;
+}
+
+function renderAlerts() {
+  const alerts=buildAlerts(),a=alerts[alertIndex%alerts.length];
+  const b=document.getElementById("alert-banner");
+  b.style.cssText=(ALERT_STYLES[a.type]||"background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);")+";border-radius:16px;padding:10px 20px;border-width:1px;border-style:solid;";
+  document.getElementById("alert-type").textContent=`${a.type} · ${a.label}`;
+  document.getElementById("alert-msg").textContent=a.msg;
+}
+
+function openModal(id) {
+  const q=QUEST_DETAILS[id];if(!q)return;
+  const live=liveQuestState[id]||{},p=live.progress||0,s=live.statusNote||live.status||"Available";
+  document.getElementById("modal-title").textContent=`${q.icon} ${q.name}`;
+  document.getElementById("modal-level-badge").textContent=q.level;
+  document.getElementById("modal-level-badge").className=`pill pill-${q.level}`;
+  document.getElementById("modal-points").textContent=`${q.points} pts`;
+  document.getElementById("modal-status-text").textContent=s;
+  document.getElementById("modal-desc").textContent=q.desc;
+  document.getElementById("modal-progress-pct").textContent=`${p}%`;
+  document.getElementById("modal-progress-bar").style.width=`${p}%`;
+  document.getElementById("modal-owner").textContent=q.owner;
+  document.getElementById("modal-deadline").textContent=q.deadline;
+  document.getElementById("modal-criteria").textContent=q.successCriteria;
+  document.getElementById("modal-proof").textContent=q.proofRequired;
+  document.getElementById("modal-submit").textContent=q.submitPath;
+  document.getElementById("modal").classList.remove("hidden");
+}
+function closeModal(){document.getElementById("modal").classList.add("hidden");}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+
+function renderFallback() {
+  document.getElementById("leaderboard-grid").innerHTML=`<div style="grid-column:span 8;text-align:center;color:#ef4444;padding:20px 0;font-size:13px;">⚠️ Could not load data. Check your connection.</div>`;
+}
+
+// ── BOOT ──────────────────────────────────────────────────
+async function initDashboard() {
+  renderHeader();
+  renderFeast();
+  renderBigPlays();
+  await loadSharePointData();
+  setInterval(()=>{alertIndex++;renderAlerts();},5000);
+  setInterval(()=>{questPage++;renderQuestPage();},10000);
+  setInterval(loadSharePointData, REFRESH_MS);
+}
+
+// Handle auth on page load
+handleRedirect();
+</script>
+</body>
+</html>
