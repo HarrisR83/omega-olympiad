@@ -1,227 +1,625 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Trials of Olympus — Omega Computer Services</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body { background: radial-gradient(circle at top left, #1B2A52 0%, #0B1020 45%, #050711 100%); min-height: 100vh; color: #fff; font-family: 'Inter', system-ui, sans-serif; font-size: 14px; line-height: 1.4; overflow-x: hidden; }
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
 
-  .page { padding: 12px; max-width: 1800px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
-  .grid-12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
-  .col-6 { grid-column: span 6; }
-  .col-3 { grid-column: span 3; }
+:root {
+  --obsidian:   #06080F;
+  --deep-navy:  #0D1220;
+  --navy:       #111933;
+  --navy-light: #1A2540;
+  --gold:       #F5C518;
+  --gold-dim:   #B8950F;
+  --gold-glow:  rgba(245,197,24,0.15);
+  --gold-border:rgba(245,197,24,0.35);
+  --crimson:    #C0392B;
+  --emerald:    #27AE60;
+  --ice:        #E8EDF5;
+  --slate:      #8896A8;
+  --border:     rgba(255,255,255,0.08);
+  --panel-bg:   rgba(13,18,32,0.97);
+}
 
-  .panel { border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(17,25,51,0.95); box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: hidden; }
-  .panel-header { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .panel-title { font-size: 16px; font-weight: 900; letter-spacing: -0.02em; }
-  .panel-subtitle { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; }
-  .panel-body { padding: 12px; }
-  .panel-body-gap { display: flex; flex-direction: column; gap: 8px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
 
-  .main-header { border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .header-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.35em; color: #fcd34d; }
-  .header-title { font-size: 32px; font-weight: 900; letter-spacing: -0.03em; }
-  .header-stats { display: grid; grid-template-columns: repeat(4, auto); gap: 8px; align-items: center; }
-  .stat-box { border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; text-align: center; min-width: 80px; }
-  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
-  .stat-value { font-size: 20px; font-weight: 900; margin-top: 2px; }
-  .sync-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #94a3b8; }
-  .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+body {
+  background: var(--obsidian);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(30,45,90,0.6) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(20,10,40,0.5) 0%, transparent 60%);
+  min-height: 100vh;
+  color: var(--ice);
+  font-family: 'Barlow', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-x: hidden;
+}
 
-  .alert-banner { border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; }
-  .alert-type { font-size: 10px; text-transform: uppercase; letter-spacing: 0.35em; color: #cbd5e1; }
-  .alert-msg { font-size: 22px; font-weight: 900; margin-top: 2px; letter-spacing: -0.02em; }
+/* ── LAYOUT ── */
+.page { padding: 14px; max-width: 1900px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+.grid-main { display: grid; grid-template-columns: 6fr 3fr 3fr; gap: 12px; }
 
-  .lb-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
-  .lb-card { border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-height: 90px; }
-  .lb-rank { font-size: 10px; color: #cbd5e1; }
-  .lb-icon { font-size: 20px; }
-  .lb-name { font-size: 11px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lb-points { font-size: 26px; font-weight: 900; }
-  .lb-delta { font-size: 11px; font-weight: 700; }
+/* ── PANEL ── */
+.panel {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.02);
+}
+.panel-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ice);
+}
+.panel-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+.panel-body { padding: 12px; }
+.panel-stack { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
 
-  .team-ARES       { background: linear-gradient(135deg,rgba(239,68,68,0.3),rgba(127,29,29,0.2)); border: 1px solid rgba(248,113,113,0.4); }
-  .team-ARTEMIS    { background: linear-gradient(135deg,rgba(168,85,247,0.3),rgba(88,28,135,0.2)); border: 1px solid rgba(192,132,252,0.4); }
-  .team-HERMES     { background: linear-gradient(135deg,rgba(14,165,233,0.3),rgba(12,74,110,0.2)); border: 1px solid rgba(56,189,248,0.4); }
-  .team-ATHENA     { background: linear-gradient(135deg,rgba(234,179,8,0.3),rgba(113,63,18,0.2)); border: 1px solid rgba(250,204,21,0.4); }
-  .team-DEMETER    { background: linear-gradient(135deg,rgba(34,197,94,0.3),rgba(20,83,45,0.2)); border: 1px solid rgba(74,222,128,0.4); }
-  .team-HEPHAESTUS { background: linear-gradient(135deg,rgba(249,115,22,0.3),rgba(124,45,18,0.2)); border: 1px solid rgba(251,146,60,0.4); }
-  .team-APHRODITE  { background: linear-gradient(135deg,rgba(236,72,153,0.3),rgba(131,24,67,0.2)); border: 1px solid rgba(244,114,182,0.4); }
-  .team-ZEUS       { background: linear-gradient(135deg,rgba(59,130,246,0.3),rgba(30,58,138,0.2)); border: 1px solid rgba(96,165,250,0.4); }
-  .team-default    { background: linear-gradient(135deg,rgba(100,116,139,0.3),rgba(51,65,85,0.2)); border: 1px solid rgba(148,163,184,0.4); }
+/* ── HEADER ── */
+.main-header {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(20,28,55,0.98) 0%, rgba(13,18,32,0.98) 100%);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.header-brand { display: flex; flex-direction: column; gap: 2px; }
+.header-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.header-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ice);
+  line-height: 1;
+}
+.header-right { display: flex; align-items: center; gap: 10px; }
+.sync-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: var(--slate);
+}
+.pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; flex-shrink: 0; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(74,222,128,0.4)} 50%{opacity:0.6;box-shadow:0 0 0 4px rgba(74,222,128,0)} }
+.stat-group { display: flex; gap: 8px; }
+.stat-box {
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  text-align: center;
+  min-width: 76px;
+}
+.stat-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--slate); }
+.stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; margin-top: 1px; line-height: 1; }
+.stat-val.gold { color: var(--gold); }
+.stat-val.green { color: #4ade80; }
 
-  .accent-ARES { color:#fca5a5; } .accent-ARTEMIS { color:#d8b4fe; } .accent-HERMES { color:#7dd3fc; }
-  .accent-ATHENA { color:#fde68a; } .accent-DEMETER { color:#86efac; } .accent-HEPHAESTUS { color:#fdba74; }
-  .accent-APHRODITE { color:#f9a8d4; } .accent-ZEUS { color:#93c5fd; } .accent-default { color:#cbd5e1; }
+/* ── ALERT BANNER ── */
+.alert-wrap {
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.6s;
+  position: relative;
+}
+.alert-inner {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.alert-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.alert-text { flex: 1; }
+.alert-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.alert-msg {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  margin-top: 2px;
+}
 
-  .quest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .quest-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; cursor: pointer; transition: background 0.15s, border-color 0.15s; text-align: left; color: inherit; width: 100%; }
-  .quest-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(252,211,77,0.4); }
-  .quest-name { font-size: 13px; font-weight: 800; }
-  .quest-desc { font-size: 11px; color: #94a3b8; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .quest-pts { font-size: 13px; font-weight: 900; color: #fcd34d; }
-  .quest-right { text-align: right; flex-shrink: 0; }
+/* Alert types */
+.alert-WIN        { background: linear-gradient(135deg,rgba(39,174,96,0.2),rgba(39,174,96,0.05)); border-color: rgba(39,174,96,0.3); }
+.alert-NEAR-WIN   { background: linear-gradient(135deg,rgba(245,197,24,0.2),rgba(245,197,24,0.05)); border-color: var(--gold-border); }
+.alert-RACE       { background: linear-gradient(135deg,rgba(52,152,219,0.2),rgba(52,152,219,0.05)); border-color: rgba(52,152,219,0.3); }
+.alert-UNCLAIMED  { background: linear-gradient(135deg,rgba(192,57,43,0.2),rgba(192,57,43,0.05)); border-color: rgba(192,57,43,0.3); }
+.alert-EXPIRING   { background: linear-gradient(135deg,rgba(230,126,34,0.2),rgba(230,126,34,0.05)); border-color: rgba(230,126,34,0.3); }
+.alert-BOTTLENECK { background: linear-gradient(135deg,rgba(192,57,43,0.25),rgba(192,57,43,0.05)); border-color: rgba(192,57,43,0.4); }
+.badge-WIN        { background: rgba(39,174,96,0.25);  color: #5ddb8e; }
+.badge-NEAR-WIN   { background: rgba(245,197,24,0.2);  color: var(--gold); }
+.badge-RACE       { background: rgba(52,152,219,0.25); color: #7ec8f0; }
+.badge-UNCLAIMED  { background: rgba(192,57,43,0.25);  color: #e87b6e; }
+.badge-EXPIRING   { background: rgba(230,126,34,0.25); color: #f0a668; }
+.badge-BOTTLENECK { background: rgba(192,57,43,0.3);   color: #e87b6e; }
 
-  .pill { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 9999px; }
-  .pill-Easy       { background: rgba(16,185,129,0.2); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.3); }
-  .pill-Medium     { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(251,191,36,0.3); }
-  .pill-Alliance   { background: rgba(14,165,233,0.2); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.3); }
-  .pill-Multiplier { background: rgba(244,63,94,0.2);  color: #fda4af; border: 1px solid rgba(251,113,133,0.3); }
+/* ── LEADERBOARD ── */
+.lb-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  align-items: end;
+}
+.lb-card {
+  border-radius: 10px;
+  padding: 12px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.lb-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 10px 10px 0 0;
+}
+.lb-rank-badge {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.4);
+}
+.lb-icon { font-size: 22px; line-height: 1; }
+.lb-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lb-points {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--ice);
+}
+.lb-delta {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+.lb-bottom { display: flex; align-items: flex-end; justify-content: space-between; }
 
-  .progress-track { height: 7px; border-radius: 9999px; background: rgba(255,255,255,0.1); overflow: hidden; margin-top: 8px; }
-  .progress-fill  { height: 100%; border-radius: 9999px; background: linear-gradient(to right, #fcd34d, #f97316); }
-  .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+/* Rank 1 gets gold treatment */
+.lb-rank-1 { min-height: 120px; }
+.lb-rank-1 .lb-points { font-size: 44px; }
+.lb-rank-1 .lb-icon { font-size: 28px; }
+.lb-rank-1 .lb-name { font-size: 13px; color: rgba(255,255,255,0.9); }
+.lb-rank-1::before { background: var(--gold); box-shadow: 0 0 12px var(--gold); }
 
-  .claimed-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; }
-  .claimed-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .claimed-team { font-size: 13px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
-  .claimed-quest { font-size: 12px; color: #e2e8f0; }
-  .claimed-owner { font-size: 11px; color: #94a3b8; }
-  .claimed-status { font-size: 11px; font-weight: 700; color: #fcd34d; white-space: nowrap; }
+/* Rank 2 silver */
+.lb-rank-2 { min-height: 108px; }
+.lb-rank-2 .lb-points { font-size: 36px; }
+.lb-rank-2::before { background: #C0C0C0; }
 
-  .multiplier-card { background: rgba(244,63,94,0.1); border: 1px solid rgba(253,164,175,0.2); border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: space-between; }
-  .multiplier-title { font-size: 13px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
-  .multiplier-status { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-  .multiplier-pts { font-size: 16px; font-weight: 900; color: #fda4af; }
-  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 4px 0; }
-  .monthly-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; display: flex; gap: 10px; align-items: flex-start; }
-  .monthly-icon { font-size: 22px; flex-shrink: 0; }
-  .monthly-title { font-size: 13px; font-weight: 900; }
-  .monthly-desc  { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+/* Rank 3 bronze */
+.lb-rank-3 { min-height: 100px; }
+.lb-rank-3 .lb-points { font-size: 30px; }
+.lb-rank-3::before { background: #CD7F32; }
 
-  .feast-panel { border-radius: 16px; overflow: hidden; border: 1px solid rgba(252,211,77,0.3); background: linear-gradient(135deg, rgba(17,25,51,0.98) 0%, rgba(30,20,5,0.95) 100%); box-shadow: 0 0 40px rgba(252,211,77,0.08); }
-  .feast-header { padding: 10px 16px; border-bottom: 1px solid rgba(252,211,77,0.2); display: flex; align-items: center; justify-content: space-between; background: rgba(252,211,77,0.06); }
-  .feast-title { font-size: 16px; font-weight: 900; letter-spacing: -0.02em; color: #fcd34d; }
-  .feast-subtitle { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #92400e; }
-  .feast-body { padding: 14px 16px; display: flex; align-items: center; gap: 16px; }
-  .feast-icon { font-size: 40px; flex-shrink: 0; }
-  .feast-info { flex: 1; min-width: 0; }
-  .feast-month { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #d97706; margin-bottom: 4px; }
-  .feast-team { font-size: 26px; font-weight: 900; letter-spacing: -0.03em; color: #fcd34d; }
-  .feast-duty { font-size: 11px; color: #94a3b8; margin-top: 4px; line-height: 1.5; }
-  .feast-badge { font-size: 10px; padding: 3px 10px; border-radius: 9999px; background: rgba(252,211,77,0.15); border: 1px solid rgba(252,211,77,0.3); color: #fcd34d; white-space: nowrap; flex-shrink: 0; }
+/* Rank 4-8 */
+.lb-rank-4 .lb-points, .lb-rank-5 .lb-points, .lb-rank-6 .lb-points,
+.lb-rank-7 .lb-points, .lb-rank-8 .lb-points { font-size: 26px; }
+.lb-rank-4, .lb-rank-5, .lb-rank-6, .lb-rank-7, .lb-rank-8 { min-height: 90px; }
+.lb-rank-4::before, .lb-rank-5::before, .lb-rank-6::before,
+.lb-rank-7::before, .lb-rank-8::before { background: rgba(255,255,255,0.15); }
 
-  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; }
-  .modal-box { width: 100%; max-width: 640px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); background: #111933; box-shadow: 0 40px 120px rgba(0,0,0,0.8); overflow: hidden; }
-  .modal-head { background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 20px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-  .modal-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.35em; color: #fcd34d; }
-  .modal-name { font-size: 26px; font-weight: 900; margin-top: 4px; }
-  .modal-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
-  .modal-close { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .modal-close:hover { background: rgba(255,255,255,0.2); }
-  .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
-  .modal-desc { font-size: 16px; color: #e2e8f0; line-height: 1.6; }
-  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .info-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; }
-  .info-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; }
-  .info-value { font-size: 13px; font-weight: 600; margin-top: 4px; }
-  .info-block { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; }
-  .info-block-highlight { background: rgba(252,211,77,0.08); border-color: rgba(252,211,77,0.2); }
-  .info-block-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 6px; }
-  .info-block-label-gold { color: #fcd34d; }
-  .info-block-value { font-size: 13px; color: #f1f5f9; line-height: 1.6; }
+/* Team colors */
+.team-ARES       { background: linear-gradient(160deg,rgba(192,57,43,0.35),rgba(80,20,15,0.3)); border: 1px solid rgba(231,76,60,0.3); }
+.team-ARTEMIS    { background: linear-gradient(160deg,rgba(142,68,173,0.35),rgba(60,20,80,0.3)); border: 1px solid rgba(155,89,182,0.3); }
+.team-HERMES     { background: linear-gradient(160deg,rgba(41,128,185,0.35),rgba(15,50,80,0.3)); border: 1px solid rgba(52,152,219,0.3); }
+.team-ATHENA     { background: linear-gradient(160deg,rgba(183,149,11,0.35),rgba(80,60,5,0.3)); border: 1px solid rgba(241,196,15,0.3); }
+.team-DEMETER    { background: linear-gradient(160deg,rgba(39,174,96,0.35),rgba(15,70,35,0.3)); border: 1px solid rgba(46,204,113,0.3); }
+.team-HEPHAESTUS { background: linear-gradient(160deg,rgba(211,84,0,0.35),rgba(80,30,0,0.3)); border: 1px solid rgba(230,126,34,0.3); }
+.team-APHRODITE  { background: linear-gradient(160deg,rgba(192,57,120,0.35),rgba(80,15,50,0.3)); border: 1px solid rgba(231,76,150,0.3); }
+.team-ZEUS       { background: linear-gradient(160deg,rgba(52,73,170,0.35),rgba(20,30,80,0.3)); border: 1px solid rgba(74,105,189,0.3); }
+.team-default    { background: linear-gradient(160deg,rgba(100,116,139,0.25),rgba(40,50,65,0.3)); border: 1px solid rgba(148,163,184,0.2); }
 
-  .hidden { display: none !important; }
-  .fade-in { animation: fadeIn 0.35s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
-  .text-gold { color: #fcd34d; }
-  .text-muted { color: #94a3b8; }
-  .empty-state { color: #64748b; font-size: 13px; padding: 16px 0; }
+.accent-ARES { color: #e87b6e; } .accent-ARTEMIS { color: #c39bd3; } .accent-HERMES { color: #7ec8f0; }
+.accent-ATHENA { color: #f7dc6f; } .accent-DEMETER { color: #82e0aa; } .accent-HEPHAESTUS { color: #f0a868; }
+.accent-APHRODITE { color: #f1948a; } .accent-ZEUS { color: #85c1e9; } .accent-default { color: #94a3b8; }
+
+/* ── QUEST CARDS ── */
+.quest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.quest-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  width: 100%;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.quest-card:hover { background: rgba(255,255,255,0.08); border-color: var(--gold-border); transform: translateY(-1px); }
+.quest-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.quest-icon { font-size: 20px; flex-shrink: 0; }
+.quest-info { flex: 1; min-width: 0; }
+.quest-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ice);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.quest-desc { font-size: 11px; color: var(--slate); margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+.quest-right { text-align: right; flex-shrink: 0; }
+.quest-pts {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1;
+}
+
+/* Tier pills */
+.pill { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; margin-top: 3px; }
+.pill-Easy       { background: rgba(39,174,96,0.2);  color: #5ddb8e; border: 1px solid rgba(39,174,96,0.3); }
+.pill-Medium     { background: rgba(245,197,24,0.15); color: var(--gold); border: 1px solid var(--gold-border); }
+.pill-Alliance   { background: rgba(52,152,219,0.2); color: #7ec8f0; border: 1px solid rgba(52,152,219,0.3); }
+.pill-Multiplier { background: rgba(192,57,43,0.2);  color: #e87b6e; border: 1px solid rgba(192,57,43,0.3); }
+
+/* Progress */
+.prog-track { height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.08); overflow: hidden; margin-top: 10px; }
+.prog-fill   { height: 100%; border-radius: 9999px; background: linear-gradient(to right, var(--gold), #e67e22); }
+.prog-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--slate); margin-top: 4px; font-weight: 500; }
+
+/* ── CLAIMED ── */
+.claimed-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 12px;
+}
+.claimed-team-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.claimed-quest-name { font-size: 12px; color: var(--ice); margin-top: 2px; font-weight: 500; }
+.claimed-owner { font-size: 11px; color: var(--slate); margin-top: 1px; }
+.claimed-status { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+.claimed-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  color: var(--slate);
+  font-size: 12px;
+  text-align: center;
+  gap: 8px;
+}
+.empty-icon { font-size: 28px; opacity: 0.4; }
+
+/* ── BIG PLAYS ── */
+.multiplier-card {
+  background: linear-gradient(135deg, rgba(192,57,43,0.15), rgba(80,20,15,0.1));
+  border: 1px solid rgba(192,57,43,0.25);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.mult-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mult-status { font-size: 11px; color: var(--slate); margin-top: 2px; }
+.mult-pts { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; color: #e87b6e; line-height: 1; }
+.section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0; }
+.monthly-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.monthly-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.monthly-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.monthly-desc { font-size: 11px; color: var(--slate); margin-top: 2px; line-height: 1.4; }
+
+/* ── FEAST ── */
+.feast-panel {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--gold-border);
+  background: linear-gradient(135deg, rgba(30,22,5,0.98) 0%, rgba(13,18,32,0.98) 60%);
+  box-shadow: 0 0 40px rgba(245,197,24,0.06), inset 0 1px 0 rgba(245,197,24,0.1);
+  position: relative;
+}
+.feast-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+}
+.feast-header {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--gold-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245,197,24,0.04);
+}
+.feast-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.feast-subtitle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.feast-body { padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
+.feast-icon-wrap {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(245,197,24,0.1);
+  border: 1px solid var(--gold-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.feast-info { flex: 1; min-width: 0; }
+.feast-month {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 4px;
+}
+.feast-team {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gold);
+  line-height: 1;
+}
+.feast-duty { font-size: 11px; color: var(--slate); margin-top: 5px; line-height: 1.5; max-width: 600px; }
+.feast-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 4px;
+  background: rgba(245,197,24,0.12);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── MODAL ── */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(4px); }
+.modal-box { width: 100%; max-width: 640px; border-radius: 16px; border: 1px solid rgba(245,197,24,0.2); background: var(--navy); box-shadow: 0 40px 120px rgba(0,0,0,0.8), 0 0 60px rgba(245,197,24,0.05); overflow: hidden; }
+.modal-head { background: rgba(245,197,24,0.04); border-bottom: 1px solid rgba(245,197,24,0.15); padding: 20px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.modal-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+.modal-name { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; margin-top: 4px; }
+.modal-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.modal-close { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.08); border: none; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.modal-close:hover { background: rgba(255,255,255,0.15); }
+.modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+.modal-desc { font-size: 15px; color: rgba(232,237,245,0.85); line-height: 1.6; }
+.prog-label-row { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--slate); letter-spacing: 0.06em; text-transform: uppercase; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.info-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.info-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--slate); }
+.info-val { font-size: 13px; font-weight: 600; margin-top: 4px; color: var(--ice); }
+.info-block { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.info-block-hl { background: rgba(245,197,24,0.06); border-color: rgba(245,197,24,0.2); }
+.info-block-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--slate); margin-bottom: 6px; }
+.info-block-label-gold { color: var(--gold); }
+.info-block-val { font-size: 13px; color: var(--ice); line-height: 1.6; }
+
+/* ── UTIL ── */
+.hidden { display: none !important; }
+.fade-in { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
 
-<div class="page" id="dashboard">
+<div class="page">
 
+  <!-- HEADER -->
   <header class="main-header">
-    <div>
+    <div class="header-brand">
       <div class="header-eyebrow">Omega Computer Services</div>
       <div class="header-title">Trials of Olympus</div>
     </div>
-    <div class="header-stats">
-      <div class="sync-row">
+    <div class="header-right">
+      <div class="sync-pill">
         <div class="pulse-dot" id="sync-dot"></div>
         <span id="sync-label">Loading…</span>
       </div>
-      <div class="stat-box">
-        <div class="stat-label">Quarter</div>
-        <div class="stat-value text-gold" id="hdr-quarter">—</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Week</div>
-        <div class="stat-value" id="hdr-week">—</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Days Left</div>
-        <div class="stat-value" style="color:#4ade80;" id="hdr-days">—</div>
+      <div class="stat-group">
+        <div class="stat-box">
+          <div class="stat-label">Quarter</div>
+          <div class="stat-val gold" id="hdr-quarter">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Week</div>
+          <div class="stat-val" id="hdr-week">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Days Left</div>
+          <div class="stat-val green" id="hdr-days">—</div>
+        </div>
       </div>
     </div>
   </header>
 
-  <div class="alert-banner" id="alert-banner" style="background:rgba(255,255,255,0.05);">
-    <div class="alert-type" id="alert-type">Loading…</div>
-    <div class="alert-msg" id="alert-msg">Fetching live data…</div>
+  <!-- ALERT BANNER -->
+  <div class="alert-wrap" id="alert-wrap">
+    <div class="alert-inner">
+      <div class="alert-badge" id="alert-badge">—</div>
+      <div class="alert-text">
+        <div class="alert-eyebrow" id="alert-eyebrow">—</div>
+        <div class="alert-msg" id="alert-msg">Connecting to live data…</div>
+      </div>
+    </div>
   </div>
 
+  <!-- LEADERBOARD -->
   <div class="panel">
     <div class="panel-header">
       <div class="panel-title">🏆 Leaderboard</div>
-      <div class="panel-subtitle">This Week</div>
+      <div class="panel-sub">Live Standings</div>
     </div>
     <div class="panel-body">
       <div class="lb-grid" id="leaderboard-grid">
-        <div style="grid-column:span 8;text-align:center;color:#64748b;padding:20px 0;font-size:13px;">Loading…</div>
+        <div style="grid-column:span 8;text-align:center;color:#8896A8;padding:24px 0;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;">Loading standings…</div>
       </div>
     </div>
   </div>
 
-  <div class="grid-12">
-    <div class="col-6">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">⚡ Quest Options</div>
-          <div class="panel-subtitle" id="quest-page-label">Loading…</div>
-        </div>
-        <div class="panel-body">
-          <div class="quest-grid" id="quest-grid">
-            <div style="grid-column:span 2;text-align:center;color:#64748b;padding:20px 0;font-size:13px;">Loading…</div>
-          </div>
+  <!-- MAIN ROW -->
+  <div class="grid-main">
+
+    <!-- QUEST OPTIONS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">⚡ Quest Options</div>
+        <div class="panel-sub" id="quest-page-label">Loading…</div>
+      </div>
+      <div class="panel-body">
+        <div class="quest-grid" id="quest-grid">
+          <div style="grid-column:span 2;text-align:center;color:#8896A8;padding:24px 0;font-size:13px;">Loading quests…</div>
         </div>
       </div>
     </div>
-    <div class="col-3">
-      <div class="panel" style="height:100%;">
-        <div class="panel-header">
-          <div class="panel-title">🤝 Claimed</div>
-          <div class="panel-subtitle">Who Owns What</div>
-        </div>
-        <div class="panel-body panel-body-gap" id="claimed-panel">
-          <div class="empty-state">Loading…</div>
-        </div>
+
+    <!-- CLAIMED -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🤝 Claimed</div>
+        <div class="panel-sub">Who Owns What</div>
+      </div>
+      <div class="panel-stack" id="claimed-panel">
+        <div class="empty-state"><div class="empty-icon">🎯</div><div>No quests claimed yet</div></div>
       </div>
     </div>
-    <div class="col-3">
-      <div class="panel" style="height:100%;">
-        <div class="panel-header">
-          <div class="panel-title">🔥 Big Plays</div>
-          <div class="panel-subtitle">High Impact</div>
-        </div>
-        <div class="panel-body panel-body-gap" id="bigplays-panel"></div>
+
+    <!-- BIG PLAYS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🔥 Big Plays</div>
+        <div class="panel-sub">High Impact</div>
       </div>
+      <div class="panel-stack" id="bigplays-panel"></div>
     </div>
+
   </div>
 
+  <!-- PROVIDERS OF THE FEAST -->
   <div class="feast-panel">
     <div class="feast-header">
       <div class="feast-title">⚜️ Providers of the Feast</div>
       <div class="feast-subtitle">Monthly Honor</div>
     </div>
     <div class="feast-body">
-      <div class="feast-icon">🍽️</div>
+      <div class="feast-icon-wrap">🍽️</div>
       <div class="feast-info">
         <div class="feast-month" id="feast-month">—</div>
         <div class="feast-team" id="feast-team">—</div>
@@ -242,8 +640,8 @@
         <div class="modal-name" id="modal-title">—</div>
         <div class="modal-meta">
           <span id="modal-level-badge" class="pill">—</span>
-          <span id="modal-points" class="text-gold" style="font-size:13px;font-weight:700;">—</span>
-          <span id="modal-status-text" class="text-muted" style="font-size:13px;">—</span>
+          <span id="modal-points" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--gold);">—</span>
+          <span id="modal-status-text" style="font-size:12px;color:var(--slate);">—</span>
         </div>
       </div>
       <button class="modal-close" onclick="closeModal()">×</button>
@@ -251,46 +649,44 @@
     <div class="modal-body">
       <div class="modal-desc" id="modal-desc">—</div>
       <div>
-        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#94a3b8;"><span>Progress</span><span id="modal-progress-pct">0%</span></div>
-        <div class="progress-track" style="margin-top:6px;"><div class="progress-fill" id="modal-progress-bar" style="width:0%"></div></div>
+        <div class="prog-label-row"><span>Progress</span><span id="modal-progress-pct">0%</span></div>
+        <div class="prog-track" style="height:6px;margin-top:6px;"><div class="prog-fill" id="modal-progress-bar" style="width:0%"></div></div>
       </div>
       <div class="info-grid">
-        <div class="info-card"><div class="info-label">Owner</div><div class="info-value" id="modal-owner">—</div></div>
-        <div class="info-card"><div class="info-label">Deadline</div><div class="info-value" id="modal-deadline">—</div></div>
+        <div class="info-card"><div class="info-label">Owner</div><div class="info-val" id="modal-owner">—</div></div>
+        <div class="info-card"><div class="info-label">Deadline</div><div class="info-val" id="modal-deadline">—</div></div>
       </div>
-      <div class="info-block"><div class="info-block-label">Success Criteria</div><div class="info-block-value" id="modal-criteria">—</div></div>
-      <div class="info-block"><div class="info-block-label">Proof Required</div><div class="info-block-value" id="modal-proof">—</div></div>
-      <div class="info-block info-block-highlight"><div class="info-block-label info-block-label-gold">How to Submit</div><div class="info-block-value" id="modal-submit">—</div></div>
+      <div class="info-block"><div class="info-block-label">Success Criteria</div><div class="info-block-val" id="modal-criteria">—</div></div>
+      <div class="info-block"><div class="info-block-label">Proof Required</div><div class="info-block-val" id="modal-proof">—</div></div>
+      <div class="info-block info-block-hl"><div class="info-block-label info-block-label-gold">How to Submit</div><div class="info-block-val" id="modal-submit">—</div></div>
     </div>
   </div>
 </div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────
-// Rewst writes scores.json to this repo on a schedule.
-// No auth needed — just a public JSON fetch.
-const DATA_URL  = "https://HarrisR83.github.io/omega-olympiad/scores.json";
+const DATA_URL   = "https://HarrisR83.github.io/omega-olympiad/scores.json";
 const REFRESH_MS = 60000;
 
 // ── STATIC QUEST DATA ─────────────────────────────────────
 const QUEST_DETAILS = {
-  "hydra-slayer":          { icon:"🐉", level:"Easy",       points:10,  name:"Hydra Slayer",         desc:"Reduce one recurring ticket type by 50%.",                             owner:"Service Desk",                         deadline:"Friday at 4:00 PM",                     successCriteria:"Identify a ticket type with at least 5 occurrences this week, implement a fix, and reduce repeat tickets by 50%.",                                                                                       proofRequired:"Freshdesk ticket list, quest tag report, and a short summary of the fix.",              submitPath:"Freshdesk tag: Quest_HydraSlayer" },
-  "perfect-flow":          { icon:"📨", level:"Easy",       points:10,  name:"Perfect Flow",          desc:"No missed follow-ups for one business day.",                           owner:"Dispatch / Hermes",                    deadline:"End of business day",                   successCriteria:"All required follow-ups are completed on time with no stale tickets missed during business hours.",                                                                                                    proofRequired:"Follow-up queue audit or Freshdesk report.",                                            submitPath:"Teams quest submission + follow-up report" },
-  "story-forge":           { icon:"📣", level:"Medium",     points:15,  name:"Story Forge",           desc:"Turn one solved issue into published content.",                        owner:"Marketing / Aphrodite",                deadline:"Friday at noon",                        successCriteria:"Use one real solved client issue to create an approved LinkedIn post, blog, or internal success story.",                                                                                               proofRequired:"Published content link and source ticket number.",                                       submitPath:"Marketing quest form" },
-  "perfect-deployment":    { icon:"🤝", level:"Alliance",   points:25,  name:"Perfect Deployment",    desc:"Inventory + Dispatch + Field complete an install with zero issues.",   owner:"Inventory + Dispatch + Field",         deadline:"72 hours after install",                successCriteria:"Inventory stages equipment 24 hours before install, Dispatch schedules without reschedule, Field completes install, and no follow-up ticket is created within 72 hours.",                              proofRequired:"Install ticket, staging checklist, schedule notes, and 72-hour follow-up check.",        submitPath:"Linked project/install ticket" },
-  "revenue-loop":          { icon:"💰", level:"Multiplier", points:40,  name:"Revenue Loop",          desc:"Client meeting creates 3 tickets that close within 3 business days.",  owner:"Account Manager + Service",            deadline:"3 business days after ticket creation", successCriteria:"AM meets with a client, identifies at least 3 actionable issues, creates tickets within 24 hours, and all 3 are closed within 3 business days with no reopen for 72 hours.",                         proofRequired:"Meeting note, three ticket IDs, closure timestamps, and reopen check.",                 submitPath:"Quest submission form + ticket IDs" },
-  "client-voice":          { icon:"💬", level:"Medium",     points:15,  name:"Client Voice",          desc:"Capture one usable client quote or testimonial.",                      owner:"Marketing / Aphrodite",                deadline:"Friday at noon",                        successCriteria:"Capture one approved client quote tied to a real outcome, project, ticket, or service improvement.",                                                                                                   proofRequired:"Client approval, quote, and source context.",                                           submitPath:"Marketing quest form" },
-  "campaign-from-pain":    { icon:"🎯", level:"Medium",     points:20,  name:"Campaign From Pain",    desc:"Turn a real client pain point into a campaign idea.",                  owner:"Marketing / Sales",                    deadline:"Friday 3:00 PM",                        successCriteria:"Identify a repeated client issue and create one campaign concept, email draft, or sales enablement piece.",                                                                                            proofRequired:"Source tickets plus campaign draft/link.",                                              submitPath:"Marketing quest form" },
-  "lead-spark":            { icon:"🧲", level:"Medium",     points:20,  name:"Lead Spark",            desc:"Create 3 meaningful sales touches from service insights.",             owner:"Sales / Marketing",                    deadline:"Friday 4:00 PM",                        successCriteria:"Use ticket/project/customer insight to create 3 targeted follow-ups or outreach opportunities.",                                                                                                      proofRequired:"CRM entries or outreach log.",                                                          submitPath:"CRM + quest submission" },
-  "ready-rack":            { icon:"📦", level:"Easy",       points:10,  name:"Ready Rack",            desc:"Prep 5 devices ahead of demand.",                                      owner:"Inventory / Demeter",                  deadline:"Friday 4:00 PM",                        successCriteria:"Five devices are fully prepped, labeled, assigned correctly, and ready before they are urgently needed.",                                                                                             proofRequired:"Asset records and prep checklist.",                                                     submitPath:"Inventory tracker + quest submission" },
-  "asset-cleanup":         { icon:"🌾", level:"Easy",       points:10,  name:"Asset Cleanup",         desc:"Fix 10 asset record issues.",                                          owner:"Inventory / Demeter",                  deadline:"Friday 4:00 PM",                        successCriteria:"Correct 10 inaccurate, missing, or mismatched asset records.",                                                                                                                                     proofRequired:"Before/after asset list.",                                                              submitPath:"Inventory quest form" },
-  "install-kit":           { icon:"🧰", level:"Alliance",   points:25,  name:"Perfect Kit",           desc:"Build a complete install kit with zero missing parts.",                owner:"Inventory + Field / Demeter + Athena", deadline:"Before install day",                    successCriteria:"All equipment, cables, labels, and notes are prepared before Field arrives onsite.",                                                                                                               proofRequired:"Checklist plus install ticket confirmation.",                                            submitPath:"Linked install ticket" },
-  "field-intel":           { icon:"🦉", level:"Medium",     points:15,  name:"Field Intel",           desc:"Bring back 2 useful client environment findings.",                     owner:"Field Service / Athena",               deadline:"Friday 4:00 PM",                        successCriteria:"Identify two issues, risks, or improvement opportunities while onsite and log them clearly.",                                                                                                        proofRequired:"Ticket IDs or project notes.",                                                          submitPath:"Freshdesk / project notes" },
-  "clean-handoff":         { icon:"🤲", level:"Alliance",   points:25,  name:"Clean Handoff",         desc:"Project handoff to Service with no missing support info.",             owner:"PST + Service / Hephaestus",           deadline:"Before project close",                  successCriteria:"Service Desk confirms they have documentation, passwords/locations, support notes, and known issues.",                                                                                               proofRequired:"Handoff checklist signed by Service lead.",                                             submitPath:"Project ticket / handoff form" },
-  "automation-bounty":     { icon:"⚒️", level:"Multiplier", points:45,  name:"Automation Bounty",     desc:"Build automation that reduces a repeat task.",                         owner:"PST / Automation",                     deadline:"Monthly",                               successCriteria:"Automation reduces a repeated task or ticket category and has a measurable before/after impact.",                                                                                                    proofRequired:"Automation link plus before/after counts.",                                             submitPath:"Automation quest submission" },
-  "zeus-removes-roadblock":{ icon:"⚡", level:"Medium",     points:20,  name:"Remove the Roadblock",  desc:"Leadership removes one blocker slowing a team down.",                 owner:"Leadership / Zeus",                    deadline:"Friday 4:00 PM",                        successCriteria:"Identify one blocker raised by a team and remove it or make a clear decision that moves work forward.",                                                                                              proofRequired:"Before/after note and impacted team confirmation.",                                     submitPath:"Leadership quest log" },
-  "shoutout-storm":        { icon:"🏅", level:"Easy",       points:10,  name:"Shoutout Storm",        desc:"Leadership recognizes 3 specific team wins.",                          owner:"Leadership / Zeus",                    deadline:"Friday meeting",                        successCriteria:"Recognize 3 specific wins tied to behavior we want repeated, not generic compliments.",                                                                                                             proofRequired:"Teams post or meeting notes.",                                                          submitPath:"Leadership quest log" },
-  "dispatch-clean-queue":  { icon:"👟", level:"Easy",       points:10,  name:"Clean Queue",           desc:"No stale unassigned tickets older than 30 minutes.",                  owner:"Dispatch / Hermes",                    deadline:"One business day",                      successCriteria:"All new tickets are triaged and assigned within the agreed window for a full business day.",                                                                                                         proofRequired:"Freshdesk queue report.",                                                              submitPath:"Freshdesk report + quest tag" },
+  "hydra-slayer":          { icon:"🐉", level:"Easy",       points:10,  name:"Hydra Slayer",         desc:"Reduce one recurring ticket type by 50%.",                             owner:"Service Desk",                         deadline:"Friday at 4:00 PM",                     successCriteria:"Identify a ticket type with at least 5 occurrences this week, implement a fix, and reduce repeat tickets by 50%.",                               proofRequired:"Freshdesk ticket list, quest tag report, and a short summary of the fix.",      submitPath:"Freshdesk tag: Quest_HydraSlayer" },
+  "perfect-flow":          { icon:"📨", level:"Easy",       points:10,  name:"Perfect Flow",          desc:"No missed follow-ups for one business day.",                           owner:"Dispatch / Hermes",                    deadline:"End of business day",                   successCriteria:"All required follow-ups are completed on time with no stale tickets missed during business hours.",                                                proofRequired:"Follow-up queue audit or Freshdesk report.",                                    submitPath:"Teams quest submission + follow-up report" },
+  "story-forge":           { icon:"📣", level:"Medium",     points:15,  name:"Story Forge",           desc:"Turn one solved issue into published content.",                        owner:"Marketing / Aphrodite",                deadline:"Friday at noon",                        successCriteria:"Use one real solved client issue to create an approved LinkedIn post, blog, or internal success story.",                                           proofRequired:"Published content link and source ticket number.",                               submitPath:"Marketing quest form" },
+  "perfect-deployment":    { icon:"🤝", level:"Alliance",   points:25,  name:"Perfect Deployment",    desc:"Inventory + Dispatch + Field complete an install with zero issues.",   owner:"Inventory + Dispatch + Field",         deadline:"72 hours after install",                successCriteria:"Inventory stages equipment 24 hours before install, Dispatch schedules without reschedule, Field completes install, and no follow-up ticket within 72 hours.", proofRequired:"Install ticket, staging checklist, schedule notes, and 72-hour follow-up check.", submitPath:"Linked project/install ticket" },
+  "revenue-loop":          { icon:"💰", level:"Multiplier", points:40,  name:"Revenue Loop",          desc:"Client meeting creates 3 tickets that close within 3 business days.",  owner:"Account Manager + Service",            deadline:"3 business days after ticket creation", successCriteria:"AM meets with a client, identifies at least 3 actionable issues, creates tickets within 24 hours, and all 3 close within 3 business days with no reopen for 72 hours.", proofRequired:"Meeting note, three ticket IDs, closure timestamps, and reopen check.",         submitPath:"Quest submission form + ticket IDs" },
+  "client-voice":          { icon:"💬", level:"Medium",     points:15,  name:"Client Voice",          desc:"Capture one usable client quote or testimonial.",                      owner:"Marketing / Aphrodite",                deadline:"Friday at noon",                        successCriteria:"Capture one approved client quote tied to a real outcome, project, ticket, or service improvement.",                                               proofRequired:"Client approval, quote, and source context.",                                   submitPath:"Marketing quest form" },
+  "campaign-from-pain":    { icon:"🎯", level:"Medium",     points:20,  name:"Campaign From Pain",    desc:"Turn a real client pain point into a campaign idea.",                  owner:"Marketing / Sales",                    deadline:"Friday 3:00 PM",                        successCriteria:"Identify a repeated client issue and create one campaign concept, email draft, or sales enablement piece.",                                        proofRequired:"Source tickets plus campaign draft/link.",                                      submitPath:"Marketing quest form" },
+  "lead-spark":            { icon:"🧲", level:"Medium",     points:20,  name:"Lead Spark",            desc:"Create 3 meaningful sales touches from service insights.",             owner:"Sales / Marketing",                    deadline:"Friday 4:00 PM",                        successCriteria:"Use ticket/project/customer insight to create 3 targeted follow-ups or outreach opportunities.",                                                   proofRequired:"CRM entries or outreach log.",                                                  submitPath:"CRM + quest submission" },
+  "ready-rack":            { icon:"📦", level:"Easy",       points:10,  name:"Ready Rack",            desc:"Prep 5 devices ahead of demand.",                                      owner:"Inventory / Demeter",                  deadline:"Friday 4:00 PM",                        successCriteria:"Five devices are fully prepped, labeled, assigned correctly, and ready before they are urgently needed.",                                          proofRequired:"Asset records and prep checklist.",                                             submitPath:"Inventory tracker + quest submission" },
+  "asset-cleanup":         { icon:"🌾", level:"Easy",       points:10,  name:"Asset Cleanup",         desc:"Fix 10 asset record issues.",                                          owner:"Inventory / Demeter",                  deadline:"Friday 4:00 PM",                        successCriteria:"Correct 10 inaccurate, missing, or mismatched asset records.",                                                                                   proofRequired:"Before/after asset list.",                                                      submitPath:"Inventory quest form" },
+  "install-kit":           { icon:"🧰", level:"Alliance",   points:25,  name:"Perfect Kit",           desc:"Build a complete install kit with zero missing parts.",                owner:"Inventory + Field / Demeter + Athena", deadline:"Before install day",                    successCriteria:"All equipment, cables, labels, and notes are prepared before Field arrives onsite.",                                                               proofRequired:"Checklist plus install ticket confirmation.",                                   submitPath:"Linked install ticket" },
+  "field-intel":           { icon:"🦉", level:"Medium",     points:15,  name:"Field Intel",           desc:"Bring back 2 useful client environment findings.",                     owner:"Field Service / Athena",               deadline:"Friday 4:00 PM",                        successCriteria:"Identify two issues, risks, or improvement opportunities while onsite and log them clearly.",                                                     proofRequired:"Ticket IDs or project notes.",                                                  submitPath:"Freshdesk / project notes" },
+  "clean-handoff":         { icon:"🤲", level:"Alliance",   points:25,  name:"Clean Handoff",         desc:"Project handoff to Service with no missing support info.",             owner:"PST + Service / Hephaestus",           deadline:"Before project close",                  successCriteria:"Service Desk confirms they have documentation, passwords/locations, support notes, and known issues.",                                            proofRequired:"Handoff checklist signed by Service lead.",                                    submitPath:"Project ticket / handoff form" },
+  "automation-bounty":     { icon:"⚒️", level:"Multiplier", points:45,  name:"Automation Bounty",     desc:"Build automation that reduces a repeat task.",                         owner:"PST / Automation",                     deadline:"Monthly",                               successCriteria:"Automation reduces a repeated task or ticket category and has a measurable before/after impact.",                                                 proofRequired:"Automation link plus before/after counts.",                                     submitPath:"Automation quest submission" },
+  "zeus-removes-roadblock":{ icon:"⚡", level:"Medium",     points:20,  name:"Remove the Roadblock",  desc:"Leadership removes one blocker slowing a team down.",                 owner:"Leadership / Zeus",                    deadline:"Friday 4:00 PM",                        successCriteria:"Identify one blocker raised by a team and remove it or make a clear decision that moves work forward.",                                           proofRequired:"Before/after note and impacted team confirmation.",                             submitPath:"Leadership quest log" },
+  "shoutout-storm":        { icon:"🏅", level:"Easy",       points:10,  name:"Shoutout Storm",        desc:"Leadership recognizes 3 specific team wins.",                          owner:"Leadership / Zeus",                    deadline:"Friday meeting",                        successCriteria:"Recognize 3 specific wins tied to behavior we want repeated, not generic compliments.",                                                           proofRequired:"Teams post or meeting notes.",                                                  submitPath:"Leadership quest log" },
+  "dispatch-clean-queue":  { icon:"👟", level:"Easy",       points:10,  name:"Clean Queue",           desc:"No stale unassigned tickets older than 30 minutes.",                  owner:"Dispatch / Hermes",                    deadline:"One business day",                      successCriteria:"All new tickets are triaged and assigned within the agreed window for a full business day.",                                                      proofRequired:"Freshdesk queue report.",                                                      submitPath:"Freshdesk report + quest tag" },
 };
 
 const TEAMS = ["ARES","ARTEMIS","HERMES","ATHENA","DEMETER","HEPHAESTUS","APHRODITE","ZEUS"];
@@ -300,60 +696,38 @@ const MONTHLY_TRIALS = [
   { icon:"🛡️", title:"Shield of Athena",   desc:"Identify and fix one real security risk." },
 ];
 const MULTIPLIERS = [
-  { icon:"💰", title:"Revenue Loop",      points:40, id:"revenue-loop" },
-  { icon:"🚨", title:"Save the Account",  points:50, id:null },
-  { icon:"🚀", title:"Transformation Win",points:75, id:null },
+  { icon:"💰", title:"Revenue Loop",       points:40, id:"revenue-loop" },
+  { icon:"🚨", title:"Save the Account",   points:50, id:null },
+  { icon:"🚀", title:"Transformation Win", points:75, id:null },
 ];
-const ALERT_STYLES = {
-  WIN:        "background:linear-gradient(to right,rgba(52,211,153,0.2),transparent);border-color:rgba(110,231,183,0.2);",
-  "NEAR WIN": "background:linear-gradient(to right,rgba(251,191,36,0.2),transparent);border-color:rgba(252,211,77,0.2);",
-  RACE:       "background:linear-gradient(to right,rgba(56,189,248,0.2),transparent);border-color:rgba(125,211,252,0.2);",
-  UNCLAIMED:  "background:linear-gradient(to right,rgba(244,63,94,0.2),transparent);border-color:rgba(253,164,175,0.2);",
-  EXPIRING:   "background:linear-gradient(to right,rgba(249,115,22,0.2),transparent);border-color:rgba(253,186,116,0.2);",
-  BOTTLENECK: "background:linear-gradient(to right,rgba(239,68,68,0.2),transparent);border-color:rgba(252,165,165,0.2);",
-};
 
 // ── STATE ─────────────────────────────────────────────────
-let liveScores = [], liveQuestState = {}, alertIndex = 0, questPage = 0, lastUpdated = null;
+let liveScores=[], liveQuestState={}, alertIndex=0, questPage=0, lastUpdated=null;
 
-// ── FETCH scores.json FROM GITHUB ─────────────────────────
+// ── DATA FETCH ────────────────────────────────────────────
 async function loadData() {
   try {
     const res = await fetch(DATA_URL + "?t=" + Date.now());
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-
-    liveScores = (data.teams || []).sort((a,b) => a.rank - b.rank).map(t => ({
-      team:   (t.team||"").toUpperCase(),
-      icon:   t.icon || "⚡",
-      points: t.points || 0,
-      delta:  t.weeklyDelta > 0 ? `+${t.weeklyDelta}` : String(t.weeklyDelta || 0),
-      rank:   t.rank || 99,
+    liveScores = (data.teams||[]).sort((a,b)=>a.rank-b.rank).map(t=>({
+      team:(t.team||"").toUpperCase(), icon:t.icon||"⚡",
+      points:t.points||0, delta:t.weeklyDelta>0?`+${t.weeklyDelta}`:String(t.weeklyDelta||0), rank:t.rank||99,
     }));
-
-    liveQuestState = {};
-    (data.quests || []).forEach(q => {
-      if (q.id) liveQuestState[q.id] = {
-        claimedByTeam:   q.claimedByTeam   || "",
-        claimedByPerson: q.claimedByPerson || "",
-        progress:        q.progress        || 0,
-        status:          q.status          || "Available",
-        statusNote:      q.statusNote      || q.status || "Available",
-      };
-    });
-
+    liveQuestState={};
+    (data.quests||[]).forEach(q=>{ if(q.id) liveQuestState[q.id]={ claimedByTeam:q.claimedByTeam||"", claimedByPerson:q.claimedByPerson||"", progress:q.progress||0, status:q.status||"Available", statusNote:q.statusNote||q.status||"Available" }; });
     lastUpdated = data.lastUpdated ? new Date(data.lastUpdated) : new Date();
     setSyncStatus(true);
     renderAll();
   } catch(err) {
-    console.error("Data fetch error:", err);
+    console.error("Fetch error:", err);
     setSyncStatus(false);
     if (!liveScores.length) renderFallback();
   }
 }
 
 function setSyncStatus(ok) {
-  document.getElementById("sync-dot").style.background = ok ? "#4ade80" : "#f87171";
+  document.getElementById("sync-dot").style.background = ok ? "#4ade80" : "#e74c3c";
   document.getElementById("sync-label").textContent = ok
     ? `Live · ${lastUpdated.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`
     : "Offline — last known data";
@@ -361,21 +735,17 @@ function setSyncStatus(ok) {
 
 // ── QUARTER ───────────────────────────────────────────────
 function getQuarterStatus() {
-  const d = new Date(), q = Math.floor(d.getMonth()/3)+1;
-  const qs = new Date(d.getFullYear(),(q-1)*3,1), qe = new Date(d.getFullYear(),q*3,0);
+  const d=new Date(), q=Math.floor(d.getMonth()/3)+1;
+  const qs=new Date(d.getFullYear(),(q-1)*3,1), qe=new Date(d.getFullYear(),q*3,0);
   return { quarter:`Q${q}`, weekOfQuarter:Math.floor((d-qs)/604800000)+1, daysLeft:Math.max(0,Math.ceil((qe-d)/86400000)) };
 }
 
 // ── FEAST ─────────────────────────────────────────────────
 function getFeastTeam() {
-  const now = new Date(), year = now.getFullYear(), month = now.getMonth();
-  function seededShuffle(arr, seed) {
-    const a=[...arr]; let s=seed;
-    for(let i=a.length-1;i>0;i--){s=(s*1664525+1013904223)&0xffffffff;const j=Math.abs(s)%(i+1);[a[i],a[j]]=[a[j],a[i]];}
-    return a;
-  }
-  const shuffled = seededShuffle(TEAMS, year);
-  const extended = [];
+  const now=new Date(), year=now.getFullYear(), month=now.getMonth();
+  function seededShuffle(arr,seed){const a=[...arr];let s=seed;for(let i=a.length-1;i>0;i--){s=(s*1664525+1013904223)&0xffffffff;const j=Math.abs(s)%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+  const shuffled=seededShuffle(TEAMS,year);
+  const extended=[];
   for(let i=0;i<12;i++){const c=shuffled[i%shuffled.length];if(extended.length>0&&extended[extended.length-1]===c){extended.push(shuffled[(i+1)%shuffled.length]);}else{extended.push(c);}}
   return { team:extended[month], monthName:now.toLocaleString("default",{month:"long"}), monthNum:month+1 };
 }
@@ -387,33 +757,38 @@ function renderFeast() {
   document.getElementById("feast-badge").textContent = `Month ${monthNum} of 8`;
 }
 
-// ── RENDER ────────────────────────────────────────────────
-function renderAll() {
-  renderHeader(); renderLeaderboard(); renderQuestPage(); renderClaimed(); renderBigPlays(); renderAlerts();
-}
+// ── RENDER ALL ────────────────────────────────────────────
+function renderAll() { renderHeader(); renderLeaderboard(); renderQuestPage(); renderClaimed(); renderBigPlays(); renderAlerts(); }
 
 function renderHeader() {
-  const q = getQuarterStatus();
-  document.getElementById("hdr-quarter").textContent = q.quarter;
-  document.getElementById("hdr-week").textContent    = q.weekOfQuarter;
-  document.getElementById("hdr-days").textContent    = q.daysLeft;
+  const q=getQuarterStatus();
+  document.getElementById("hdr-quarter").textContent=q.quarter;
+  document.getElementById("hdr-week").textContent=q.weekOfQuarter;
+  document.getElementById("hdr-days").textContent=q.daysLeft;
 }
 
+// ── LEADERBOARD ───────────────────────────────────────────
 function renderLeaderboard() {
-  const g = document.getElementById("leaderboard-grid");
-  if (!liveScores.length) { g.innerHTML=`<div style="grid-column:span 8;text-align:center;color:#64748b;padding:20px 0;font-size:13px;">No score data yet.</div>`; return; }
-  g.innerHTML = liveScores.map(t => {
-    const tc=`team-${t.team}`, ac=`accent-${t.team}`;
-    return `<div class="lb-card ${tc} fade-in">
-      <div style="display:flex;align-items:center;justify-content:space-between;"><div class="lb-icon">${t.icon}</div><div class="lb-rank">#${t.rank}</div></div>
+  const g=document.getElementById("leaderboard-grid");
+  if(!liveScores.length){g.innerHTML=`<div style="grid-column:span 8;text-align:center;color:#8896A8;padding:24px 0;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;">No score data yet</div>`;return;}
+  g.innerHTML=liveScores.map(t=>{
+    const tc=`team-${t.team}`, ac=`accent-${t.team}`, rc=`lb-rank-${t.rank}`;
+    const deltaSign = t.delta===("0")||t.delta==="+0" ? "" : t.delta;
+    return `<div class="lb-card ${tc} ${rc} fade-in">
+      <div class="lb-rank-badge">#${t.rank}</div>
+      <div class="lb-icon">${t.icon}</div>
       <div class="lb-name">${t.team}</div>
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;"><div class="lb-points">${t.points}</div><div class="lb-delta ${ac}">${t.delta}</div></div>
+      <div class="lb-bottom">
+        <div class="lb-points">${t.points}</div>
+        ${deltaSign ? `<div class="lb-delta ${ac}">${t.delta}</div>` : ''}
+      </div>
     </div>`;
   }).join("");
 }
 
+// ── QUESTS ────────────────────────────────────────────────
 function getQuestList() {
-  return Object.entries(QUEST_DETAILS).map(([id,q]) => {
+  return Object.entries(QUEST_DETAILS).map(([id,q])=>{
     const live=liveQuestState[id]||{};
     return { id,...q, progress:live.progress||0, statusNote:live.statusNote||live.status||"Available", liveStatus:live.status||"Available" };
   });
@@ -423,59 +798,84 @@ function renderQuestPage() {
   const quests=getQuestList(), total=Math.ceil(quests.length/6);
   if(questPage>=total) questPage=0;
   const visible=quests.slice(questPage*6,questPage*6+6);
-  document.getElementById("quest-page-label").textContent=`Rotating ${questPage+1}/${total}`;
+  document.getElementById("quest-page-label").textContent=`Page ${questPage+1} of ${total}`;
   document.getElementById("quest-grid").innerHTML=visible.map(q=>`
     <button class="quest-card fade-in" onclick="openModal('${q.id}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-        <div style="min-width:0;"><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:18px;">${q.icon}</span><span class="quest-name">${q.name}</span></div><div class="quest-desc">${q.desc}</div></div>
-        <div class="quest-right"><div class="quest-pts">${q.points}</div><span class="pill pill-${q.level}">${q.level}</span></div>
+      <div class="quest-card-top">
+        <div class="quest-icon">${q.icon}</div>
+        <div class="quest-info">
+          <div class="quest-name">${q.name}</div>
+          <div class="quest-desc">${q.desc}</div>
+        </div>
+        <div class="quest-right">
+          <div class="quest-pts">${q.points}</div>
+          <div><span class="pill pill-${q.level}">${q.level}</span></div>
+        </div>
       </div>
-      <div class="progress-track"><div class="progress-fill" style="width:${q.progress}%"></div></div>
-      <div class="progress-labels"><span>${q.progress}%</span><span>${q.statusNote}</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${q.progress}%"></div></div>
+      <div class="prog-labels"><span>${q.progress}%</span><span>${q.statusNote}</span></div>
     </button>`).join("");
 }
 
+// ── CLAIMED ───────────────────────────────────────────────
 function renderClaimed() {
   const claimed=Object.entries(liveQuestState).filter(([,v])=>v.status==="Claimed"&&v.claimedByTeam).map(([id,v])=>({id,...QUEST_DETAILS[id],...v}));
   const p=document.getElementById("claimed-panel");
-  if(!claimed.length){p.innerHTML=`<div class="empty-state">No quests claimed yet.</div>`;return;}
+  if(!claimed.length){p.innerHTML=`<div class="empty-state"><div class="empty-icon">🎯</div><div>No quests claimed yet</div></div>`;return;}
   p.innerHTML=claimed.map(c=>`
     <div class="claimed-card fade-in">
-      <div class="claimed-top"><div><div class="claimed-team"><span>${c.icon||"⚡"}</span>${c.claimedByTeam}</div><div class="claimed-quest">${c.name||c.id}</div><div class="claimed-owner">Owner: ${c.claimedByPerson||"—"}</div></div><div class="claimed-status">${c.statusNote||"Claimed"}</div></div>
-      <div class="progress-track"><div class="progress-fill" style="width:${c.progress}%"></div></div>
-      <div class="progress-labels"><span>${c.progress}% complete</span></div>
+      <div class="claimed-top">
+        <div>
+          <div class="claimed-team-name"><span>${c.icon||"⚡"}</span>${c.claimedByTeam}</div>
+          <div class="claimed-quest-name">${c.name||c.id}</div>
+          <div class="claimed-owner">Lead: ${c.claimedByPerson||"—"}</div>
+        </div>
+        <div class="claimed-status">${c.statusNote||"Claimed"}</div>
+      </div>
+      <div class="prog-track" style="margin-top:10px;"><div class="prog-fill" style="width:${c.progress}%"></div></div>
+      <div class="prog-labels"><span>${c.progress}% complete</span></div>
     </div>`).join("");
 }
 
+// ── BIG PLAYS ─────────────────────────────────────────────
 function renderBigPlays() {
-  const mults=MULTIPLIERS.map(m=>{const live=m.id?liveQuestState[m.id]:null;return`<div class="multiplier-card"><div><div class="multiplier-title"><span>${m.icon}</span>${m.title}</div><div class="multiplier-status">${live?(live.statusNote||live.status):"Unclaimed"}</div></div><div class="multiplier-pts">${m.points}</div></div>`;}).join("");
+  const mults=MULTIPLIERS.map(m=>{
+    const live=m.id?liveQuestState[m.id]:null;
+    const status=live?(live.statusNote||live.status):"Unclaimed";
+    return `<div class="multiplier-card"><div><div class="mult-title"><span>${m.icon}</span>${m.title}</div><div class="mult-status">${status}</div></div><div class="mult-pts">${m.points}</div></div>`;
+  }).join("");
   const trials=MONTHLY_TRIALS.map(t=>`<div class="monthly-card"><div class="monthly-icon">${t.icon}</div><div><div class="monthly-title">${t.title}</div><div class="monthly-desc">${t.desc}</div></div></div>`).join("");
-  document.getElementById("bigplays-panel").innerHTML=mults+`<hr class="divider">`+trials;
+  document.getElementById("bigplays-panel").innerHTML=mults+`<hr class="section-divider">`+trials;
 }
 
+// ── ALERTS ────────────────────────────────────────────────
 function buildAlerts() {
   const alerts=[],scores=[...liveScores].sort((a,b)=>a.rank-b.rank),quests=getQuestList();
-  if(scores.length>=2) alerts.push({type:"RACE",label:"Leaderboard Pressure",msg:`${scores[1].team} is ${scores[0].points-scores[1].points} pts behind ${scores[0].team}`});
-  if(scores.length>=1&&scores[0].delta!=="0") alerts.push({type:"WIN",label:"Leading Team",msg:`${scores[0].team} leads with ${scores[0].points} pts (${scores[0].delta} this week)`});
+  if(scores.length>=2&&scores[0].points!==scores[1].points) alerts.push({type:"RACE",label:"Leaderboard",msg:`${scores[1].team} is ${scores[0].points-scores[1].points} pts behind ${scores[0].team}`});
+  if(scores.length>=1&&scores[0].delta&&scores[0].delta!=="0"&&scores[0].delta!=="+0") alerts.push({type:"WIN",label:"Leading Team",msg:`${scores[0].team} leads with ${scores[0].points} pts (${scores[0].delta} this week)`});
   quests.forEach(q=>{
     if(q.liveStatus==="Claimed"&&q.progress>=75) alerts.push({type:"NEAR WIN",label:"Almost There",msg:`${q.name} is ${q.progress}% complete — almost done!`});
-    if(q.liveStatus==="Available"&&q.points>=25) alerts.push({type:"UNCLAIMED",label:"Open Opportunity",msg:`${q.name} is unclaimed (+${q.points} pts)`});
+    if(q.liveStatus==="Available"&&q.points>=25) alerts.push({type:"UNCLAIMED",label:"Open Opportunity",msg:`${q.name} is unclaimed — ${q.points} pts on the table`});
   });
-  if(!alerts.length) alerts.push({type:"RACE",label:"Season Active",msg:"Trials of Olympus is underway — claim your quests!"});
+  if(!alerts.length) alerts.push({type:"RACE",label:"Season Active",msg:"Trials of Olympus — Q3 is underway. Claim your quests."});
   return alerts;
 }
 
 function renderAlerts() {
-  const alerts=buildAlerts(),a=alerts[alertIndex%alerts.length];
-  const b=document.getElementById("alert-banner");
-  b.style.cssText=(ALERT_STYLES[a.type]||"background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);")+";border-radius:16px;padding:10px 20px;border-width:1px;border-style:solid;";
-  document.getElementById("alert-type").textContent=`${a.type} · ${a.label}`;
+  const alerts=buildAlerts(), a=alerts[alertIndex%alerts.length];
+  const typeKey=a.type.replace(" ","-");
+  const wrap=document.getElementById("alert-wrap");
+  wrap.className=`alert-wrap alert-${typeKey}`;
+  document.getElementById("alert-badge").className=`alert-badge badge-${typeKey}`;
+  document.getElementById("alert-badge").textContent=a.type;
+  document.getElementById("alert-eyebrow").textContent=a.label;
   document.getElementById("alert-msg").textContent=a.msg;
 }
 
+// ── MODAL ─────────────────────────────────────────────────
 function openModal(id) {
-  const q=QUEST_DETAILS[id];if(!q)return;
-  const live=liveQuestState[id]||{},p=live.progress||0,s=live.statusNote||live.status||"Available";
+  const q=QUEST_DETAILS[id]; if(!q) return;
+  const live=liveQuestState[id]||{}, p=live.progress||0, s=live.statusNote||live.status||"Available";
   document.getElementById("modal-title").textContent=`${q.icon} ${q.name}`;
   document.getElementById("modal-level-badge").textContent=q.level;
   document.getElementById("modal-level-badge").className=`pill pill-${q.level}`;
@@ -494,9 +894,7 @@ function openModal(id) {
 function closeModal(){document.getElementById("modal").classList.add("hidden");}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
 
-function renderFallback() {
-  document.getElementById("leaderboard-grid").innerHTML=`<div style="grid-column:span 8;text-align:center;color:#ef4444;padding:20px 0;font-size:13px;">⚠️ Could not load scores.json — check the GitHub repo.</div>`;
-}
+function renderFallback(){document.getElementById("leaderboard-grid").innerHTML=`<div style="grid-column:span 8;text-align:center;color:#e74c3c;padding:24px 0;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;">⚠ Could not load scores.json</div>`;}
 
 // ── BOOT ──────────────────────────────────────────────────
 renderHeader();
@@ -505,7 +903,7 @@ renderBigPlays();
 loadData();
 setInterval(()=>{alertIndex++;renderAlerts();},5000);
 setInterval(()=>{questPage++;renderQuestPage();},10000);
-setInterval(loadData, REFRESH_MS);
+setInterval(loadData,REFRESH_MS);
 </script>
 </body>
 </html>
