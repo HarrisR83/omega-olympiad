@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Trials of Olympus — Omega Computer Services</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+/* System font stack — no external dependency, crisp on any display */
 
 :root {
   --obsidian:   #06080F;
@@ -34,7 +34,7 @@ body {
     radial-gradient(ellipse 60% 40% at 90% 100%, rgba(20,10,40,0.5) 0%, transparent 60%);
   min-height: 100vh;
   color: var(--ice);
-  font-family: 'Barlow', system-ui, sans-serif;
+  font-family: 'Segoe UI', system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.4;
   overflow-x: hidden;
@@ -61,7 +61,7 @@ body {
   background: rgba(255,255,255,0.02);
 }
 .panel-title {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -92,7 +92,7 @@ body {
 }
 .header-brand { display: flex; flex-direction: column; gap: 2px; }
 .header-eyebrow {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.3em;
@@ -100,7 +100,7 @@ body {
   color: var(--gold);
 }
 .header-title {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 38px;
   font-weight: 900;
   letter-spacing: 0.02em;
@@ -132,7 +132,7 @@ body {
   min-width: 76px;
 }
 .stat-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--slate); }
-.stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; margin-top: 1px; line-height: 1; }
+.stat-val { font-family: 'Arial Narrow', 'Segoe UI', sans-serif; font-size: 24px; font-weight: 900; margin-top: 1px; line-height: 1; }
 .stat-val.gold { color: var(--gold); }
 .stat-val.green { color: #4ade80; }
 
@@ -152,7 +152,7 @@ body {
   gap: 16px;
 }
 .alert-badge {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -165,7 +165,7 @@ body {
 .alert-text { flex: 1; }
 .alert-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
 .alert-msg {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 26px;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -214,7 +214,7 @@ body {
 .lb-rank-badge {
   position: absolute;
   top: 8px; right: 8px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -222,7 +222,7 @@ body {
 }
 .lb-icon { font-size: 22px; line-height: 1; }
 .lb-name {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -233,13 +233,13 @@ body {
   text-overflow: ellipsis;
 }
 .lb-points {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-weight: 900;
   line-height: 1;
   color: var(--ice);
 }
 .lb-delta {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 12px;
   font-weight: 700;
 }
@@ -302,7 +302,7 @@ body {
 .quest-icon { font-size: 20px; flex-shrink: 0; }
 .quest-info { flex: 1; min-width: 0; }
 .quest-name {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -315,7 +315,7 @@ body {
 .quest-desc { font-size: 11px; color: var(--slate); margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
 .quest-right { text-align: right; flex-shrink: 0; }
 .quest-pts {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 22px;
   font-weight: 900;
   color: var(--gold);
@@ -342,7 +342,7 @@ body {
   padding: 12px;
 }
 .claimed-team-name {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -353,7 +353,7 @@ body {
 }
 .claimed-quest-name { font-size: 12px; color: var(--ice); margin-top: 2px; font-weight: 500; }
 .claimed-owner { font-size: 11px; color: var(--slate); margin-top: 1px; }
-.claimed-status { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+.claimed-status { font-family: 'Arial Narrow', 'Segoe UI', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
 .claimed-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .empty-state {
   display: flex;
@@ -380,7 +380,7 @@ body {
   gap: 10px;
 }
 .mult-title {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -390,7 +390,7 @@ body {
   gap: 6px;
 }
 .mult-status { font-size: 11px; color: var(--slate); margin-top: 2px; }
-.mult-pts { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; color: #e87b6e; line-height: 1; }
+.mult-pts { font-family: 'Arial Narrow', 'Segoe UI', sans-serif; font-size: 24px; font-weight: 900; color: #e87b6e; line-height: 1; }
 .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0; }
 .monthly-card {
   background: rgba(255,255,255,0.03);
@@ -402,7 +402,7 @@ body {
   align-items: flex-start;
 }
 .monthly-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-.monthly-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.monthly-title { font-family: 'Arial Narrow', 'Segoe UI', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
 .monthly-desc { font-size: 11px; color: var(--slate); margin-top: 2px; line-height: 1.4; }
 
 /* ── FEAST ── */
@@ -430,7 +430,7 @@ body {
   background: rgba(245,197,24,0.04);
 }
 .feast-title {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -466,7 +466,7 @@ body {
   margin-bottom: 4px;
 }
 .feast-team {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 32px;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -476,7 +476,7 @@ body {
 }
 .feast-duty { font-size: 11px; color: var(--slate); margin-top: 5px; line-height: 1.5; max-width: 600px; }
 .feast-badge {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Arial Narrow', 'Segoe UI', sans-serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -495,7 +495,7 @@ body {
 .modal-box { width: 100%; max-width: 640px; border-radius: 16px; border: 1px solid rgba(245,197,24,0.2); background: var(--navy); box-shadow: 0 40px 120px rgba(0,0,0,0.8), 0 0 60px rgba(245,197,24,0.05); overflow: hidden; }
 .modal-head { background: rgba(245,197,24,0.04); border-bottom: 1px solid rgba(245,197,24,0.15); padding: 20px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .modal-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
-.modal-name { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; margin-top: 4px; }
+.modal-name { font-family: 'Arial Narrow', 'Segoe UI', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; margin-top: 4px; }
 .modal-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
 .modal-close { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.08); border: none; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .modal-close:hover { background: rgba(255,255,255,0.15); }
@@ -640,7 +640,7 @@ body {
         <div class="modal-name" id="modal-title">—</div>
         <div class="modal-meta">
           <span id="modal-level-badge" class="pill">—</span>
-          <span id="modal-points" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--gold);">—</span>
+          <span id="modal-points" style="font-family:'Arial Narrow','Segoe UI',sans-serif;font-size:18px;font-weight:900;color:var(--gold);">—</span>
           <span id="modal-status-text" style="font-size:12px;color:var(--slate);">—</span>
         </div>
       </div>
