@@ -1,7 +1,7 @@
 {
   "lastUpdated": "2026-07-02T23:00:00Z",
   "teams": [
-    { "team": "ARES",       "icon": "🪖", "points": 0, "weeklyDelta": 0, "rank": 1 },
+    { "team": "ARES",       "icon": "🪖", "points": 145, "weeklyDelta": 25, "rank": 1 },
     { "team": "ARTEMIS",    "icon": "🌙", "points": 0, "weeklyDelta": 0, "rank": 2 },
     { "team": "HERMES",     "icon": "👟", "points": 0, "weeklyDelta": 0, "rank": 3 },
     { "team": "ATHENA",     "icon": "🦉", "points": 0, "weeklyDelta": 0, "rank": 4 },
