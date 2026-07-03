@@ -304,10 +304,13 @@ const loginRequest = {
 
 let msalInstance = null;
 let accessToken = null;
+let msalReady = false;
 
 async function initMsal() {
+  if (msalReady) return;
   msalInstance = new msal.PublicClientApplication(msalConfig);
   await msalInstance.initialize();
+  msalReady = true;
 }
 
 async function signIn() {
@@ -605,8 +608,12 @@ async function initDashboard() {
   setInterval(loadSharePointData, REFRESH_MS);
 }
 
-// Handle auth on page load
-handleRedirect();
+// Handle auth on page load — wait for DOM + scripts to fully load
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", handleRedirect);
+} else {
+  handleRedirect();
+}
 </script>
 </body>
 </html>
