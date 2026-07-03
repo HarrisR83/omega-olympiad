@@ -300,12 +300,18 @@ const loginRequest = {
   scopes: ["https://omegacomputerservices.sharepoint.com/.default"]
 };
 
-const msalInstance = new msal.PublicClientApplication(msalConfig);
+let msalInstance = null;
 let accessToken = null;
+
+async function initMsal() {
+  msalInstance = new msal.PublicClientApplication(msalConfig);
+  await msalInstance.initialize();
+}
 
 async function signIn() {
   try {
     document.getElementById("auth-error").classList.add("hidden");
+    if (!msalInstance) await initMsal();
     const result = await msalInstance.loginPopup(loginRequest);
     msalInstance.setActiveAccount(result.account);
     await acquireToken();
@@ -331,6 +337,7 @@ async function acquireToken() {
 }
 
 async function handleRedirect() {
+  if (!msalInstance) await initMsal();
   await msalInstance.handleRedirectPromise();
   const accounts = msalInstance.getAllAccounts();
   if (accounts.length > 0) {
